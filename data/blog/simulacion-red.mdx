@@ -1,0 +1,56 @@
+---
+title: Simulacion de red segura en maquinas virtuales
+date: '2025-04-27'
+tags: ['ciberseguridad', 'networking', 'laboratorio', 'firewall', 'pfsense', 'dns']
+draft: false
+summary: 'Vamos a crear una red segura desde cero usando pfSense, NAT, VPN y entre otros, mientras vemos cómo implementar prácticas básicas de ciberseguridad en tu hogar o laboratorio virtual'
+authors: ['NP']
+---
+
+# Introduccion
+
+Para empezar el proyecto, usamos VirtualBox para crear máquinas virtuales. Tambien descargamos las imágenes ISO de pfSense y de una distro ligera (Xubuntu) para simular los clientes de red.
+
+Pueden descargar lo necesario desde:
+
+-[VirtualBox](https://www.virtualbox.org/wiki/Downloads) -[pfSense](https://atxfiles.netgate.com/mirror/downloads/) -[Xubuntu](https://xubuntu.org/download/)
+
+Una vez todo descargado, instalamos VirtualBox y dejamos todo por defecto.
+
+# Instalacion de pfSense
+
+pfSense va a ser nuestro firewall, el encargado de permitir y denegar conexiones con nuestra red interna. Tiene otras funciones que las vamos a ir viendo con el avance del proyecto. Vamos por pasos:
+
+## PASO 1. Crear la maquina virtual para pfSense.
+
+1. Abrir VirtualBox y hacer clic en "Nueva" (Ctrl + N).
+
+2. Asignar el nombre de la máquina ("pfSense").
+
+3. Seleccionar el tipo y versión:
+
+Tipo: BSD
+
+Versión: FreeBSD (64-bit) (pfSense está basado en FreeBSD).
+
+Asignar memoria RAM:
+
+Te recomiendo al menos 1024 MB (1 GB) para pfSense.
+
+Crear un disco duro virtual:
+
+Seleccionar VDI (VirtualBox Disk Image).
+
+Usar Tamaño dinámico.
+
+Tamaño recomendado: 10-20 GB (puede ser más o menos según tus necesidades).
+
+Añadir adaptadores de red:
+
+Haz clic en "Configuración" (con la máquina seleccionada).
+
+Ve a "Red" y agrega 2 adaptadores:
+
+Adaptador 1: Conéctalo a "Adaptador puente" para que se conecte a tu red local o red externa.
+
+Adaptador 2: Conéctalo a "Red interna" para conectar con las otras máquinas virtuales que crearás.
