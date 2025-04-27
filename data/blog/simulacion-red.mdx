@@ -15,42 +15,35 @@ Pueden descargar lo necesario desde:
 
 -[VirtualBox](https://www.virtualbox.org/wiki/Downloads) -[pfSense](https://atxfiles.netgate.com/mirror/downloads/) -[Xubuntu](https://xubuntu.org/download/)
 
-Una vez todo descargado, instalamos VirtualBox y dejamos todo por defecto.
+# Instalacion de las Maquinas Necesarias
 
-# Instalacion de pfSense
+Procedemos a instalar VirtualBox y las maquinas virtuales con las siguientes especificaciones:
 
-pfSense va a ser nuestro firewall, el encargado de permitir y denegar conexiones con nuestra red interna. Tiene otras funciones que las vamos a ir viendo con el avance del proyecto. Vamos por pasos:
-
-## PASO 1. Crear la maquina virtual para pfSense.
-
-1. Abrir VirtualBox y hacer clic en "Nueva" (Ctrl + N).
-
-2. Asignar el nombre de la máquina ("pfSense").
-
-3. Seleccionar el tipo y versión:
+## pfSense (nuestro firewall).
 
 Tipo: BSD
-
 Versión: FreeBSD (64-bit) (pfSense está basado en FreeBSD).
+1024 MB (1 GB) de memoria RAM.
+Disco VDI de 10GB.
+Dos adaptadores de red:
+*Adaptador 1: Conectado a "Adaptador puente" para que se conecta a nuestra red local.
+*Adaptador 2: Conectado a "Red interna" para conectar con las otras máquinas virtuales.
 
-Asignar memoria RAM:
+## Xubuntu (nuestro cliente).
 
-Te recomiendo al menos 1024 MB (1 GB) para pfSense.
+Tipo: Linux
+Versión: Ubuntu (64-bit)
+512MB de memoria RAM.
+Disco VDI de 8GB.
+Un adaptadores de red:
+\*Adaptador 1: Conectado a "Red interna" para conectar con las otras máquinas virtuales.
 
-Crear un disco duro virtual:
+![Maquina pfSense](/static/images/maquina-pfSense.png)
 
-Seleccionar VDI (VirtualBox Disk Image).
+_pfSense_: nuestro firewall con sus especificaciones.
 
-Usar Tamaño dinámico.
+![Maquina Xubuntu](/static/images/maquina-xubuntu.png)
 
-Tamaño recomendado: 10-20 GB (puede ser más o menos según tus necesidades).
+_Xubuntu_: nuestro cliente con sus especificaciones.
 
-Añadir adaptadores de red:
-
-Haz clic en "Configuración" (con la máquina seleccionada).
-
-Ve a "Red" y agrega 2 adaptadores:
-
-Adaptador 1: Conéctalo a "Adaptador puente" para que se conecte a tu red local o red externa.
-
-Adaptador 2: Conéctalo a "Red interna" para conectar con las otras máquinas virtuales que crearás.
+#
