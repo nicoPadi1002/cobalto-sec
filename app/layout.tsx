@@ -62,11 +62,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const basePath = process.env.BASE_PATH || ''
 
   return (
-    <html
-      lang="es-AR"
-      className={`${space_grotesk.variable} scroll-smooth`}
-      suppressHydrationWarning
-    >
+    
+
       <link
         rel="apple-touch-icon"
         sizes="76x76"
