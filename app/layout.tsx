@@ -26,7 +26,15 @@ export const metadata: Metadata = {
     template: `%s | ${siteMetadata.title}`,
   },
   description: siteMetadata.description,
-  openGraph: { locale: 'es_AR', type: 'website' },
+  openGraph: {
+    title: siteMetadata.title,
+    description: siteMetadata.description,
+    url: 'https://cobalto-sec.tech',
+    siteName: siteMetadata.title,
+    locale: 'es_AR',
+    type: 'website',
+    images: [{ url: '/static/images/og.png', width: 1200, height: 630 }],
+  },
   alternates: {
     canonical: 'https://cobalto-sec.tech',
     types: {
