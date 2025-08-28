@@ -1,3 +1,4 @@
+﻿import type { Metadata } from 'next'
 import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
@@ -25,17 +26,11 @@ export const metadata: Metadata = {
     template: `%s | ${siteMetadata.title}`,
   },
   description: siteMetadata.description,
-  openGraph: {
-    title: siteMetadata.title,
-    description: siteMetadata.description,
-    url: './',
-    siteName: siteMetadata.title,
-    images: [siteMetadata.socialBanner],
-    locale: 'en_US',
+  'es_AR',
     type: 'website',
   },
   alternates: {
-    canonical: './',
+    canonical: 'https://cobalto-sec.tech',
     types: {
       'application/rss+xml': `${siteMetadata.siteUrl}/feed.xml`,
     },
@@ -109,3 +104,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
+
