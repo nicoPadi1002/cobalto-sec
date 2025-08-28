@@ -26,9 +26,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteMetadata.title}`,
   },
   description: siteMetadata.description,
-  'es_AR',
-    type: 'website',
-  },
+  openGraph: { locale: 'es_AR', type: 'website' },
   alternates: {
     canonical: 'https://cobalto-sec.tech',
     types: {
@@ -104,4 +102,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
-
