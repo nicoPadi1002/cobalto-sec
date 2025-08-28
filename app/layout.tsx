@@ -1,8 +1,6 @@
-﻿import type { Metadata } from 'next'
 import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
-
 import { Space_Grotesk } from 'next/font/google'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
@@ -11,15 +9,12 @@ import SectionContainer from '@/components/SectionContainer'
 import Footer from '@/components/Footer'
 import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
-import { Metadata } from 'next'
-
 const space_grotesk = Space_Grotesk({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-space-grotesk',
 })
-
-export const metadata: Metadata = {
+export const metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
   title: {
     default: siteMetadata.title,
@@ -27,14 +22,14 @@ export const metadata: Metadata = {
   },
   description: siteMetadata.description,
   openGraph: {
-    title: siteMetadata.title,
-    description: siteMetadata.description,
-    url: 'https://cobalto-sec.tech',
-    siteName: siteMetadata.title,
-    locale: 'es_AR',
-    type: 'website',
-    images: [{ url: '/static/images/og.png', width: 1200, height: 630 }],
-  },
+  title: siteMetadata.title,
+  description: siteMetadata.description,
+  url: 'https://cobalto-sec.tech',
+  siteName: siteMetadata.title,
+  locale: 'es_AR',
+  type: 'website',
+  images: [{ url: '/static/images/og.png', width: 1200, height: 630 }],
+},
   alternates: {
     canonical: 'https://cobalto-sec.tech',
     types: {
@@ -58,10 +53,8 @@ export const metadata: Metadata = {
     images: [siteMetadata.socialBanner],
   },
 }
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const basePath = process.env.BASE_PATH || ''
-
   return (
     <html
       lang={siteMetadata.language}
