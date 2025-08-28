@@ -1,12 +1,12 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'Seguridad y algo mas',
+  title: 'Cobalto-Sec: Pentest y Seguridad',
   author: 'NP',
-  headerTitle: 'CobaltoSec',
-  description: 'Bienvenidos',
-  language: 'en-us',
+  headertitle: 'Cobalto-Sec: Pentest y Seguridad',
+  description: 'Pentest, Red/Blue/Purple Team y guías prácticas de seguridad.',
+  language: 'es-ar',
   theme: 'system', // system, dark or light
-  siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
+  siteUrl: 'https://cobalto-sec.tech',
   siteRepo: 'https://github.com/timlrx/tailwind-nextjs-starter-blog',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo.png`,
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
