@@ -62,8 +62,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const basePath = process.env.BASE_PATH || ''
 
   return (
-    <html lang="es-AR"
-      lang={siteMetadata.language}
+    <html
+      lang="es-AR"
       className={`${space_grotesk.variable} scroll-smooth`}
       suppressHydrationWarning
     >
