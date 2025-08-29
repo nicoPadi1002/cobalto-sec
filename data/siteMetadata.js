@@ -1,15 +1,23 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
+  // Identidad del sitio
   title: 'Cobalto-Sec',
   author: 'Cobalto-Sec',
   headerTitle: 'Cobalto-Sec',
   description: 'Portafolio de seguridad ofensiva: pentesting, hardening y notas técnicas.',
   language: 'es-AR',
-  theme: 'system', // system, dark or light
-  siteUrl: 'https://cobalto-sec.tech',
+  locale: 'es-AR',
+  theme: 'system', // system, dark, light
+
+  // Canonical + repos
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://cobalto-sec.tech',
   siteRepo: 'https://github.com/nicoPadi1002/cobalto-sec',
-  siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo-cobalto-b.png`,
-  socialBanner: `${process.env.BASE_PATH || ''}/static/images/logo-cobalto-b.png`,
+
+  // Imagen OG/SEO (el header usa data/logo.svg, no esto)
+  siteLogo: `${process.env.BASE_PATH || ''}/static/images/og-default.png`,
+  socialBanner: `${process.env.BASE_PATH || ''}/static/images/og-default.png`,
+
+  // Perfiles sociales
   mastodon: '',
   email: '',
   github: 'https://github.com/nicoPadi1002',
@@ -22,16 +30,24 @@ const siteMetadata = {
   instagram: '',
   medium: '',
   bluesky: '',
-  locale: 'es-AR',
+
+  // UI
   stickyNav: false,
+
+  // Analytics (silenciado hasta configurar)
   analytics: {
     umamiAnalytics: {
-      umamiWebsiteId: process.env.NEXT_UMAMI_ID,
+      // usa la env pública si existe; si no, queda vacío (no monta script)
+      umamiWebsiteId: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID || process.env.NEXT_UMAMI_ID || '',
     },
   },
+
+  // Newsletter (desactivado)
   newsletter: { provider: '' },
+
+  // Comments (silenciado hasta configurar)
   comments: {
-    provider: '',
+    provider: '', // '' => no renderiza Giscus
     giscusConfig: {
       repo: process.env.NEXT_PUBLIC_GISCUS_REPO,
       repositoryId: process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID,
@@ -46,6 +62,8 @@ const siteMetadata = {
       lang: 'es',
     },
   },
+
+  // Búsqueda
   search: {
     provider: 'kbar',
     kbarConfig: { searchDocumentsPath: `${process.env.BASE_PATH || ''}/search.json` },
