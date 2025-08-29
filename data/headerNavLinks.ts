@@ -1,9 +1,8 @@
+// data/headerNavLinks.ts
 const headerNavLinks = [
-  { href: '/', title: 'Home' },
   { href: '/blog', title: 'Blog' },
-  { href: '/tags', title: 'Tags' },
-  { href: '/projects', title: 'Projects' },
-  { href: '/about', title: 'About' },
+  { href: '/tags', title: 'Etiquetas' },
+  { href: '/about', title: 'Acerca' },
 ]
 
 export default headerNavLinks
