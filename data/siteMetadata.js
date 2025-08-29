@@ -8,7 +8,7 @@ const siteMetadata = {
   theme: 'system', // system, dark or light
   siteUrl: 'https://cobalto-sec.tech',
   siteRepo: 'https://github.com/nicoPadi1002/cobalto-sec',
-  siteLogo: '',
+  siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo-cobalto-b.svg`,
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
   mastodon: '',
   email: '',
@@ -26,7 +26,7 @@ const siteMetadata = {
   // set to true if you want a navbar fixed to the top
   stickyNav: false,
   analytics: {
-    // Dejar desactivado por ahora (sin IDs)
+    // Desactivado por ahora (sin IDs)
     umamiAnalytics: {
       umamiWebsiteId: process.env.NEXT_UMAMI_ID,
       // src: '',
