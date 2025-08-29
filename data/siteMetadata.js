@@ -8,7 +8,7 @@ const siteMetadata = {
   theme: 'system', // system, dark or light
   siteUrl: 'https://cobalto-sec.tech',
   siteRepo: 'https://github.com/nicoPadi1002/cobalto-sec',
-  siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo-cobalto-b.svg`,
+  siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo-cobalto-b.png`,
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
   mastodon: '',
   email: '',
@@ -23,25 +23,14 @@ const siteMetadata = {
   medium: '',
   bluesky: '',
   locale: 'es-AR',
-  // set to true if you want a navbar fixed to the top
   stickyNav: false,
   analytics: {
-    // Desactivado por ahora (sin IDs)
     umamiAnalytics: {
       umamiWebsiteId: process.env.NEXT_UMAMI_ID,
-      // src: '',
     },
-    // plausibleAnalytics: {},
-    // simpleAnalytics: {},
-    // posthogAnalytics: {},
-    // googleAnalytics: {},
   },
-  newsletter: {
-    // Desactivado por ahora
-    provider: '',
-  },
+  newsletter: { provider: '' },
   comments: {
-    // Desactivado por ahora
     provider: '',
     giscusConfig: {
       repo: process.env.NEXT_PUBLIC_GISCUS_REPO,
@@ -58,16 +47,8 @@ const siteMetadata = {
     },
   },
   search: {
-    provider: 'kbar', // kbar or algolia
-    kbarConfig: {
-      searchDocumentsPath: `${process.env.BASE_PATH || ''}/search.json`,
-    },
-    // provider: 'algolia',
-    // algoliaConfig: {
-    //   appId: '',
-    //   apiKey: '',
-    //   indexName: '',
-    // },
+    provider: 'kbar',
+    kbarConfig: { searchDocumentsPath: `${process.env.BASE_PATH || ''}/search.json` },
   },
 }
 
