@@ -9,7 +9,7 @@ const siteMetadata = {
   siteUrl: 'https://cobalto-sec.tech',
   siteRepo: 'https://github.com/nicoPadi1002/cobalto-sec',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo-cobalto-b.png`,
-  socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
+  socialBanner: `${process.env.BASE_PATH || ''}/static/images/logo-cobalto-b.png`,
   mastodon: '',
   email: '',
   github: 'https://github.com/nicoPadi1002',
