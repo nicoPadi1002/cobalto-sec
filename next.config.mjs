@@ -20,9 +20,10 @@ const UMAMI_HOST = (process.env.NEXT_PUBLIC_UMAMI_HOST || "analytics.umami.is")
 const USE_GISCUS = !!process.env.NEXT_PUBLIC_GISCUS_REPO
 const USE_UMAMI = !!process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
 
+// 👇 Ajuste clave: permitir 'unsafe-inline' siempre; 'unsafe-eval' solo en dev
 const ContentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self'${isDev ? " 'unsafe-eval' 'unsafe-inline'" : ""}${USE_GISCUS ? " giscus.app" : ""}${
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${USE_GISCUS ? " giscus.app" : ""}${
     USE_UMAMI ? " " + UMAMI_HOST : ""
   }`,
   "style-src 'self' 'unsafe-inline'",
@@ -54,7 +55,7 @@ const basePath = process.env.BASE_PATH || undefined
 const unoptimized = process.env.UNOPTIMIZED ? true : undefined
 
 const config = () => {
-  // aplica ambos plugins; Contentlayer primero
+  // Aplica ambos plugins; Contentlayer primero
   const plugins = [withContentlayer, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), {
     output,
