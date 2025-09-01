@@ -16,11 +16,11 @@ const UMAMI_HOST = (process.env.NEXT_PUBLIC_UMAMI_HOST || "analytics.umami.is")
   .replace(/^https?:\/\//, "")
   .replace(/\/.*$/, "")
 
-// Flags: abren permisos SOLO si existen las envs públicas
+// Flags: abren permisos SOLO si existen las envs pÃºblicas
 const USE_GISCUS = !!process.env.NEXT_PUBLIC_GISCUS_REPO
 const USE_UMAMI = !!process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
 
-// 👇 Ajuste clave: permitir 'unsafe-inline' siempre; 'unsafe-eval' solo en dev
+// ðŸ‘‡ Ajuste clave: permitir 'unsafe-inline' siempre; 'unsafe-eval' solo en dev
 const ContentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${USE_GISCUS ? " giscus.app" : ""}${
@@ -79,3 +79,45 @@ const config = () => {
 }
 
 export default config
+/** CSP condicional: solo abrimos orígenes si hay ENV públicas */
+export async function headers() {
+  const directives = [
+    "default-src 'self'",
+    "img-src 'self' data:",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline'",
+    "connect-src 'self'",
+    "font-src 'self' data:",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'"
+  ];
+
+  // Umami (si hay NEXT_PUBLIC_UMAMI_WEBSITE_ID y dominio)
+  if (process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && process.env.NEXT_PUBLIC_UMAMI_SRC) {
+    directives.push(`script-src 'self' ${process.env.NEXT_PUBLIC_UMAMI_SRC}`);
+    directives.push(`connect-src 'self' ${new URL(process.env.NEXT_PUBLIC_UMAMI_SRC).origin}`);
+  }
+
+  // Giscus (si hay NEXT_PUBLIC_GISCUS_REPO)
+  if (process.env.NEXT_PUBLIC_GISCUS_REPO) {
+    directives.push("frame-src https://giscus.app");
+    directives.push("script-src 'self' https://giscus.app");
+    directives.push("connect-src 'self' https://giscus.app");
+  }
+
+  const csp = directives.join("; ");
+
+  return [
+    {
+      source: "/(.*)",
+      headers: [
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "X-Frame-Options", value: "DENY" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        { key: "Permissions-Policy", value: "geolocation=(), microphone=(), camera=()" },
+        { key: "Content-Security-Policy", value: csp }
+      ],
+    },
+  ];
+}
