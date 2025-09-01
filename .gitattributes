@@ -1,2 +1,16 @@
-﻿# Fuerza LF en archivos de código/markdown
-*.{js,jsx,ts,tsx,css,md,mdx,json,yml,yaml} text eol=lf
+* text=auto eol=lf
+*.ps1  text eol=lf
+*.sh   text eol=lf
+*.svg  text eol=lf
+*.mdx  text eol=lf
+*.md   text eol=lf
+*.ts   text eol=lf
+*.tsx  text eol=lf
+*.js   text eol=lf
+*.jsx  text eol=lf
+*.mjs  text eol=lf
+*.css  text eol=lf
+*.json text eol=lf
+*.png  binary
+*.jpg  binary
+*.jpeg binary
