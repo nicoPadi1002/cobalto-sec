@@ -9,7 +9,10 @@
     "serve": "next start",
     "analyze": "cross-env ANALYZE=true next build",
     "lint": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf .next .turbo node_modules/.cache 2>nul || true",
+    "prebuild": "contentlayer2 build || contentlayer build || echo skip"
   },
   "dependencies": {
     "@headlessui/react": "2.2.0",
