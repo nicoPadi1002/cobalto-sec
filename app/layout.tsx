@@ -1,3 +1,4 @@
+import Script from 'next/script'
 // app/layout.tsx
 import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
