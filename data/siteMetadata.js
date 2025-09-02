@@ -4,7 +4,7 @@ const siteMetadata = {
   title: 'Cobalto-Sec',
   author: 'Cobalto-Sec',
   headerTitle: 'Cobalto-Sec',
-  description: 'Notas, gu\\u00EDas y pr\\u00E1ctica de seguridad ofensiva.',
+  description: 'Notas, guas y prctica de seguridad ofensiva.',
   language: 'es-AR',
   locale: 'es-AR',
   theme: 'system', // system, dark, light
