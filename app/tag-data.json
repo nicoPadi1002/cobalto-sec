@@ -9,5 +9,15 @@
   "smb": 1,
   "nfs": 1,
   "vnc": 1,
-  "x11": 1
+  "x11": 1,
+  "proyecto": 1,
+  "tutorial": 1,
+  "siem": 1,
+  "wazuh": 1,
+  "proxmox": 1,
+  "docker": 1,
+  "soc": 1,
+  "home-lab": 1,
+  "soar": 1,
+  "serie-cobalto-sec": 1
 }

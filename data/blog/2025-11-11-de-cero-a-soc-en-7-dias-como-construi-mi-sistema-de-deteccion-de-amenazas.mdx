@@ -40,7 +40,7 @@ Esta es la ruta que seguí (errores incluidos) y cómo podés replicarla.
 Este proyecto está pensado para que un hiring manager pueda verificar **impacto** en los primeros 60 segundos:
 
 - **Arquitectura clara** (Proxmox + LXC + Docker + Wazuh)
-- **Métricas** verificables (500+ eventos/h, <10s latencia)
+- **Métricas** verificables (500+ eventos/h, menos de 10s latencia)
 - **Pruebas reproducibles** (smoke tests y runbook)
 
 ### ¿Qué es un SIEM? (la analogía simple)
@@ -96,7 +96,7 @@ Nivel 3: Docker Container
 ├─ Single-process por container
 ├─ Overhead: ~100MB RAM
 ├─ Aislamiento: Medio
-└─ Boot time: <1 segundo
+└─ Boot time: menos de 1 segundo
 
 Mi setup: LXC (nivel 2) que CONTIENE Docker (nivel 3)
 Por qué: Balance perfecto para home lab
@@ -352,7 +352,7 @@ Después de 7 días corriendo:
 
 **Performance**
 
-- Latencia evento→alerta: **<2 s**
+- Latencia evento→alerta: ** menos de 2 s**
 - CPU promedio: **15–20%** (picos 40%)
 - RAM: **3.2 GB / 4 GB (80%)**
 - Disco: **16 GB / 30 GB (52%)**
@@ -372,9 +372,9 @@ Después de 7 días corriendo:
 | ---------------- | -------- | ----- | ------ |
 | Agentes activos  | 2        | 2     | ✅     |
 | Uptime           | 95%      | 99.8% | ✅     |
-| Tiempo respuesta | <10s     | <2s   | ✅     |
+| Tiempo respuesta | 10s      | 2s    | ✅     |
 | Eventos/hora     | 100+     | 500+  | ✅     |
-| Disk usage       | <80%     | 52%   | ✅     |
+| Disk usage       | 80%      | 52%   | ✅     |
 
 ![Gráficos de performance: CPU, RAM, eventos/tiempo](/static/images/soc-week01/metricas-performance.png)
 
@@ -544,18 +544,3 @@ Si querés el **repo completo** con configs y scripts, comentá "REPO" abajo o e
 - Diagrama de arquitectura (próximo commit)
 
 ---
-
-## Apéndice: Checklist de screenshots necesarios (calidad ≥1080p, PNG)
-
-**CRÍTICOS (necesarios para MVP):**
-
-1. ✅ Dashboard principal Wazuh mostrando eventos
-2. ✅ Proxmox UI (LXC + VMs con recursos)
-3. ✅ Alerta SSH (rule 5710) — LA MÁS IMPORTANTE
-4. ✅ Terminal con error y solución
-5. ✅ Métricas de performance (CPU, RAM, eventos)
-
-**OPCIONALES (agregar después):** 6. Múltiples tipos de alertas (FIM, sudo, HTTP)  
-7. Smoke test checkpoints (Docker ps, agent_control -l)
-
-> **Tip:** Usá **ShareX / Flameshot / Greenshot** y anotaciones (flechas y círculos). La documentación clara es parte del valor del proyecto.
