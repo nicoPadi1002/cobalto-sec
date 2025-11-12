@@ -1,0 +1,752 @@
+---
+title: 'De Cero a SOAR: Desplegando Shuffle y conectándolo con Wazuh (Mi primera automatización real)'
+date: '2025-11-12T00:00:00'
+lastmod: '2025-11-12T00:00:00'
+summary: 'De Wazuh solo a un SOAR operativo con Shuffle: arquitectura LXC en Proxmox, webhooks, errores reales y la primera alerta recibida en acción.'
+tags:
+  ['wazuh', 'shuffle', 'soar', 'siem', 'docker', 'proxmox', 'lab', 'tutorial', 'troubleshooting']
+draft: false
+authors: ['default']
+images: []
+---
+
+## Introducción
+
+Semana 1 cerró con Wazuh funcionando. Buen comienzo… pero incompleto. Las alertas existían, sí, sólo que **todo era manual**: abrir dashboard, leer evento, decidir si actuar, ejecutar comandos.
+
+Mi objetivo para esta entrega fue claro: **agregar un SOAR** que reciba alertas automáticamente y me permita orquestar respuestas sin tocar nada. La elección fue **Shuffle**, por ser open source, simple de desplegar y con un enfoque muy práctico para webhooks y workflows.
+
+Llegué con la expectativa ingenua de "plug & play en 2 horas". La realidad tuvo otros planes: redes, permisos y nombres de host jugando en mi contra. Igual lo saqué adelante, y aquí está el proceso completo (con errores y soluciones incluidas).
+
+> **Note:** Este no es un tutorial perfecto. Es mi proceso real, con decisiones de arquitectura, problemas que me frenaron y lo que aprendí en el camino.
+
+## 1. Decisiones de arquitectura
+
+Antes de tirar comandos, paré a pensar **dónde** hospedar Shuffle. Evalué tres caminos y descarté dos.
+
+### 1.1 Opciones evaluadas
+
+**❌ Docker en Windows**
+
+- Posible, pero con limitaciones de networking significativas
+- Complejidad innecesaria para rutear entre contenedores y mi homelab
+- Experiencia previa: más dolores de cabeza que beneficios
+
+**❌ VM completa en Proxmox**
+
+- Funciona bien, pero es overkill para pruebas
+- Requiere 2-4 GB de RAM mínimo
+- Arranques lentos (30-60 segundos)
+- Desperdicio de recursos para este caso de uso
+
+**✅ LXC Container en Proxmox (privileged)**
+
+- **Ligero:** arranque en <5 segundos
+- **Aislado:** destruir/recrear en minutos
+- **Acceso directo:** al Docker socket (necesario para Orborus)
+- **Snapshots rápidos:** backup/restore instantáneos
+
+> **Tip:** Para labs iterativos, LXC privileged ofrece el mejor balance entre aislamiento y velocidad. Si algo se rompe, lo destruís y volvés a levantar en minutos sin quemar 4 GB de RAM.
+
+### 1.2 Configuración final elegida
+
+- **Plataforma:** Proxmox LXC (privileged)
+- **IP estática:** 192.168.0.123
+- **Sistema base:** Ubuntu 24.04
+- **Stack interno:** Docker + Docker Compose
+- **Recursos:** 2 GB RAM, 10 GB disco
+
+**¿Por qué LXC y no VM?**  
+Porque consume menos (arranqué con 512 MB de RAM, luego escalé a 2 GB según necesidad), es instantáneo para crear/destruir, puedo mapear el Docker socket directamente, y es trivial de backupear/restaurar con snapshots de Proxmox.
+
+> **Lesson Learned:** No todo proyecto necesita una VM completa. Si vas a orquestar con Docker, tener Docker _dentro_ de una VM es muchas veces una capa de abstracción innecesaria que solo suma complejidad.
+
+## 2. Implementación paso a paso
+
+### 2.1 Creación del LXC container
+
+**En Proxmox Web UI:**
+
+1. **Create CT** (botón superior derecho)
+2. **General:**
+   - CT ID: `102`
+   - Hostname: `shuffle-soar`
+   - **Unprivileged container:** ❌ desmarcar (necesitamos privileged)
+3. **Template:**
+   - Storage: local
+   - Template: `ubuntu-24.04-standard`
+4. **Disks:**
+   - Storage: local-lvm
+   - Disk size: `10 GB`
+5. **CPU:**
+   - Cores: `2`
+6. **Memory:**
+   - RAM: `2048 MB`
+   - Swap: `512 MB`
+7. **Network:**
+   - Bridge: `vmbr0`
+   - IPv4: **Static**
+   - IPv4/CIDR: `192.168.0.123/24`
+   - Gateway: `192.168.0.1`
+   - IPv6: SLAAC (o dejar en blanco)
+
+**¿Por qué privileged?**  
+Shuffle Orborus (el componente que ejecuta apps de Docker) necesita acceso al **Docker socket del host**. Sin privileged, aparecen errores de permisos y las aplicaciones no ejecutan. Es un trade-off conocido de seguridad vs funcionalidad en labs.
+
+> **Warning:** En producción, evaluá alternativas como Docker-in-Docker o sidecar containers. Para un lab de aprendizaje, privileged está OK.
+
+### 2.2 Instalación de Docker en el LXC
+
+Arrancá el LXC y ejecutá:
+
+```bash
+# Actualizar sistema
+apt update && apt upgrade -y
+
+# Instalar Docker y herramientas
+apt install -y docker.io docker-compose git curl
+
+# Verificar instalación
+docker --version
+# Docker version 24.0.7, build...
+
+docker-compose --version
+# docker-compose version 1.29.2, build...
+
+# Iniciar y habilitar Docker
+systemctl start docker
+systemctl enable docker
+
+# Verificar que Docker corre
+docker ps
+# CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+
+> **Note:** Usé `docker.io` del repositorio de Ubuntu por velocidad. Si necesitás Docker CE (Community Edition) oficial, seguí las [instrucciones de Docker](https://docs.docker.com/engine/install/ubuntu/).
+
+### 2.3 Despliegue de Shuffle
+
+**Clonar el repositorio:**
+
+```bash
+cd /opt
+git clone https://github.com/Shuffle/Shuffle
+cd Shuffle
+
+# Verificar archivos
+ls -la
+# docker-compose.yml, .env.example, etc.
+```
+
+**Crear archivo de configuración:**
+
+Shuffle trae un `docker-compose.yml` ejemplo, pero necesité ajustarlo. Creé `docker-compose-working.yml`:
+
+```yaml
+version: '3.8'
+
+services:
+  frontend:
+    image: ghcr.io/shuffle/shuffle-frontend:latest
+    container_name: shuffle-frontend
+    hostname: shuffle-frontend
+    ports:
+      - '3001:80'
+      - '3443:443'
+    environment:
+      - BACKEND_HOSTNAME=shuffle-backend # ← CLAVE: nombre interno
+      - OUTER_HOSTNAME=192.168.0.123 # ← IP para acceso LAN
+    networks:
+      - shuffle-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    image: ghcr.io/shuffle/shuffle-backend:latest
+    container_name: shuffle-backend
+    hostname: shuffle-backend
+    ports:
+      - '5001:5001'
+    environment:
+      - SHUFFLE_APP_HOTLOAD_FOLDER=/shuffle-apps
+      - SHUFFLE_FILE_LOCATION=/shuffle-files
+      - SHUFFLE_OPENSEARCH_URL=http://shuffle-opensearch:9200
+      - SHUFFLE_ELASTIC=true
+      - ORG_ID=Shuffle
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - shuffle-apps:/shuffle-apps
+      - shuffle-files:/shuffle-files
+    networks:
+      - shuffle-network
+    depends_on:
+      - opensearch
+    restart: unless-stopped
+
+  orborus:
+    image: ghcr.io/shuffle/shuffle-orborus:latest
+    container_name: shuffle-orborus
+    hostname: shuffle-orborus
+    environment:
+      - SHUFFLE_APP_SDK_VERSION=1.2.0
+      - SHUFFLE_WORKER_VERSION=latest
+      - ORG_ID=Shuffle
+      - ENVIRONMENT_NAME=Shuffle
+      - BASE_URL=http://192.168.0.123:5001
+      - SHUFFLE_BASE_IMAGE_NAME=frikky
+      - SHUFFLE_BASE_IMAGE_REGISTRY=ghcr.io
+      - SHUFFLE_BASE_IMAGE_TAG_SUFFIX="-1.2.0"
+      - DOCKER_API_VERSION=1.40 # ← Comentar si hay problemas
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - shuffle-network
+    restart: unless-stopped
+
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: shuffle-opensearch
+    hostname: shuffle-opensearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - 'OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m'
+      - 'DISABLE_SECURITY_PLUGIN=true'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    networks:
+      - shuffle-network
+    restart: unless-stopped
+
+networks:
+  shuffle-network:
+    driver: bridge
+
+volumes:
+  shuffle-apps:
+  shuffle-files:
+  opensearch-data:
+```
+
+**Variables de entorno críticas:**
+
+- `BACKEND_HOSTNAME=shuffle-backend`: El frontend usa este nombre para llamar al backend **dentro de la red Docker**. Nunca pongas una IP externa acá.
+- `OUTER_HOSTNAME=192.168.0.123`: Esta IP es para acceso desde tu LAN (browser, Wazuh).
+- `SHUFFLE_OPENSEARCH_URL`: URL interna de OpenSearch.
+
+**Levantar los servicios:**
+
+```bash
+docker-compose -f docker-compose-working.yml up -d
+
+# Ver logs mientras arranca
+docker-compose -f docker-compose-working.yml logs -f
+
+# Verificar que todos están UP
+docker ps
+# Deberías ver: frontend, backend, orborus, opensearch
+```
+
+**Acceder al dashboard:**
+
+Abrí tu browser y andá a:
+
+```
+http://192.168.0.123:3001
+```
+
+Primera vez te pedirá crear usuario admin. Usá credenciales seguras (guardá en 1Password/Bitwarden).
+
+## 3. Troubleshooting: lo que NO funcionó al principio
+
+### 3.1 Frontend cargaba… pero quedaba pantalla negra
+
+**Síntomas:**
+
+- Dashboard se ve, pero no carga workflows/executions
+- Browser console muestra: `Failed to fetch` o timeout
+- Logs de frontend muestran: `502 Bad Gateway`
+
+**Error exacto en logs:**
+
+```
+2025/11/11 22:15:34 [error] 28#28: *1 connect() failed (110: Connection timed out)
+while connecting to upstream, client: 192.168.0.1, server: _,
+request: "GET /api/v1/checkusers HTTP/1.1",
+upstream: "http://192.168.0.123:5001/api/v1/checkusers",
+host: "192.168.0.123:3001"
+```
+
+**Causa raíz:**  
+El frontend intentaba conectarse al backend usando **la IP externa (192.168.0.123)** en lugar del **nombre interno de Docker (shuffle-backend)**. Desde la red del host esto funciona, pero desde la **red interna de Docker**, no hay ruta.
+
+**Fix:**
+
+```yaml
+# ❌ INCORRECTO (lo que tenía inicialmente)
+environment:
+  - BACKEND_HOSTNAME=192.168.0.123
+
+# ✅ CORRECTO (lo que funcionó)
+environment:
+  - BACKEND_HOSTNAME=shuffle-backend
+```
+
+Después de cambiar, hice:
+
+```bash
+docker-compose -f docker-compose-working.yml down
+docker-compose -f docker-compose-working.yml up -d
+
+# Limpiar caché del browser (Ctrl+Shift+R o modo incógnito)
+```
+
+> **Lesson Learned:** Dentro de Docker, **SIEMPRE usá nombres de contenedor**, nunca IPs. Docker DNS resuelve automáticamente los nombres dentro de la misma red. Te ahorra dolores de cabeza al reconfigurar o mover servicios.
+
+### 3.2 Orborus no ejecutaba apps
+
+**Síntomas:**
+
+- Workflows con apps (HTTP, Tools, etc.) no ejecutan
+- Executions quedan en estado "Running" infinito
+- Logs de Orborus muestran errores de Docker API
+
+**Error exacto:**
+
+```
+Error response from daemon: client version 1.40 is too old.
+Minimum supported API version is 1.44, please upgrade your client
+to a newer version.
+```
+
+**Causa raíz:**  
+Incompatibilidad de **versión de Docker API** entre Orborus y el daemon del host.
+
+**Solución parcial (temporal):**
+
+Comenté la variable `DOCKER_API_VERSION` en `docker-compose-working.yml`:
+
+```yaml
+orborus:
+  environment:
+    # - DOCKER_API_VERSION=1.40  # ← Comentado
+```
+
+Con esto, Orborus dejó de quejarse de la versión, pero seguí viendo problemas intermitentes al ejecutar apps complejas.
+
+**¿Por qué "solución parcial"?**  
+Porque **Orborus no es crítico para mi objetivo inmediato**: recibir alertas de Wazuh vía webhook. Los webhooks funcionan perfectamente sin Orborus.
+
+**¿Cuándo necesito Orborus?**  
+Cuando quiera ejecutar **apps dentro de workflows** (enrichment con APIs, bloqueos activos, scraping, etc.). Eso lo voy a refinar en iteraciones futuras del lab.
+
+> **Tip:** Si tu objetivo inmediato es **ingestar eventos y validar la integración**, no te bloquees por problemas de Orborus. Dejá ese ajuste fino para la siguiente fase. Priorizá tener el flujo básico funcionando primero.
+
+### 3.3 Browser caché engañoso
+
+**Problema menor pero frustrante:**  
+Después de arreglar `BACKEND_HOSTNAME`, el dashboard seguía sin cargar. Me tomó 10 minutos darme cuenta: **caché del browser**.
+
+**Fix:**
+
+- `Ctrl + Shift + R` (hard refresh)
+- O abrir en **modo incógnito**
+- O cambiar de browser
+
+> **Tip de debugging:** Si cambias configs de Docker y "no funciona", probá primero en modo incógnito antes de volver a reconfigurar. El caché te puede hacer perder tiempo.
+
+## 4. Integración con Wazuh
+
+Con Shuffle operativo, era momento de **cerrar el loop**: que Wazuh envíe sus alertas a Shuffle automáticamente.
+
+### 4.1 Crear Workflow con Webhook en Shuffle
+
+**Paso a paso en el dashboard:**
+
+1. **Workflows** (menú izquierdo) → **New Workflow**
+2. **Name:** `Test-Wazuh-Connection`
+3. **Description:** "Primer test de integración Wazuh→Shuffle"
+4. Arrastrar nodo **Webhook** al canvas
+5. Click en el nodo Webhook → **Show Execution Argument**
+6. Copiar la **Webhook URL**, algo como:
+   ```
+   http://192.168.0.123:3001/api/v1/hooks/webhook_a1b2c3d4e5f6...
+   ```
+7. **Save workflow**
+
+> **Note:** La URL del webhook incluye un token único. No la compartas públicamente ni la expongas fuera de tu LAN. Si la filtrás por error, podés regenerarla borrando y recreando el nodo.
+
+### 4.2 Configurar Wazuh para enviar alertas vía webhook
+
+**Desafío técnico:**  
+El contenedor de Wazuh **no incluye editores de texto** (ni nano, ni vim, ni vi). Opciones:
+
+1. Instalar nano (`apt install nano`) - agrega complejidad innecesaria
+2. Usar `sed` o `echo` para inyectar config - más portable
+3. Crear un `ossec.conf` custom y montarlo como volumen - overhead para un test
+
+Opté por **sed inline**, que es rápido y no deja dependencias.
+
+**Comandos:**
+
+```bash
+# Entrar al contenedor del Manager
+docker exec -it single-node-wazuh.manager-1 bash
+
+# Agregar bloque de integración después del cierre de </cluster>
+sed -i '/<\/cluster>/a\
+\  <integration>\
+    <name>shuffle</name>\
+    <hook_url>http://192.168.0.123:3001/api/v1/hooks/webhook_XXXXX</hook_url>\
+    <level>3</level>\
+    <alert_format>json</alert_format>\
+  </integration>' /var/ossec/etc/ossec.conf
+
+# Verificar que quedó bien (debería mostrar el bloque recién agregado)
+grep -A6 "shuffle" /var/ossec/etc/ossec.conf
+
+# Output esperado:
+#   <integration>
+#     <name>shuffle</name>
+#     <hook_url>http://192.168.0.123:3001/api/v1/hooks/webhook_XXXXX</hook_url>
+#     <level>3</level>
+#     <alert_format>json</alert_format>
+#   </integration>
+
+# Reiniciar Wazuh para aplicar cambios
+/var/ossec/bin/wazuh-control restart
+
+# Monitorear logs de integración
+tail -f /var/ossec/logs/integrations.log
+```
+
+**Parámetros clave:**
+
+- `<name>shuffle</name>`: Identificador interno (puede ser cualquier string)
+- `<hook_url>`: La URL del webhook de Shuffle (¡reemplazá `XXXXX`!)
+- `<level>3</level>`: Enviar alertas de nivel 3+ (severity: low, medium, high, critical)
+- `<alert_format>json</alert_format>`: Formato JSON (más fácil de parsear en Shuffle)
+
+> **Warning:** Cuidá la **indentación** en el `sed`. XML es sensible a espacios. Si copiás/pegás desde una terminal con encoding diferente, puede romper el archivo de config. Siempre verificá con `grep` después.
+
+### 4.3 Generar evento de prueba y validar
+
+**Generar un SSH failed login:**
+
+Desde tu PC/laptop, intentá conectarte con credenciales incorrectas:
+
+```bash
+# Reemplazá por la IP de tu VM Ubuntu con agente Wazuh
+ssh usuario_falso@192.168.0.121
+
+# Ingresar password incorrecto 3 veces
+# Wazuh detecta esto como "brute force attempt"
+```
+
+**Verificar en logs de Wazuh:**
+
+```bash
+tail -f /var/ossec/logs/integrations.log
+
+# Output esperado:
+# 2025-11-11 22:31:21 INFO: Sending alert to Shuffle
+# /tmp/shuffle-1762900283-28084295.alert
+# Alert sent successfully to webhook
+```
+
+**Verificar en Shuffle:**
+
+1. Dashboard → **Workflows** → `Test-Wazuh-Connection`
+2. Tab **Executions** (arriba a la derecha)
+3. Deberías ver una ejecución nueva con status "Success"
+4. Click en la ejecución → **Execution Argument** muestra el JSON:
+
+```json
+{
+  "severity": 1,
+  "pretext": "WAZUH Alert",
+  "title": "sshd: authentication failed.",
+  "rule_id": "5710",
+  "agent_id": "001",
+  "agent_name": "wazuh-agent-01",
+  "timestamp": "2025-11-11T22:31:21.602+0000",
+  "src_ip": "192.168.0.1",
+  "id": "1762900281.771195"
+}
+```
+
+**¡Primera alerta automática recibida! 🎉**
+
+> **Lesson Learned:** Testeá con eventos simples primero (login fallido, sudo command) antes de construir workflows complejos. Validás red, permisos y parsing en minutos, y si algo falla, sabés exactamente dónde buscar.
+
+## 5. Arquitectura final (actualizada)
+
+Así quedó mi homelab después de agregar Shuffle:
+
+```
+Internet
+    ↓
+Router: 192.168.0.1
+    ↓
+─────────────────────────────────────────────────────────
+Red Local: 192.168.0.0/24
+─────────────────────────────────────────────────────────
+    │
+    ├─ Proxmox Host: 192.168.0.115
+    │  │
+    │  ├─ LXC 100: Wazuh Manager (192.168.0.120)
+    │  │  └─ Docker Stack:
+    │  │     ├─ wazuh-manager (port 1514/udp, 1515/tcp)
+    │  │     ├─ wazuh-indexer (Elasticsearch)
+    │  │     └─ wazuh-dashboard (port 443)
+    │  │
+    │  └─ LXC 102: Shuffle SOAR (192.168.0.123) ← NUEVO
+    │     └─ Docker Stack:
+    │        ├─ shuffle-frontend (port 3001)
+    │        ├─ shuffle-backend (port 5001)
+    │        ├─ shuffle-opensearch (port 9200)
+    │        └─ shuffle-orborus
+    │
+    ├─ VM 1: wazuh-agent-01 (192.168.0.121)
+    │  └─ Ubuntu 24.04 + Wazuh Agent + SSH
+    │
+    └─ VM 2: apache-server (192.168.0.122)
+       └─ Ubuntu 24.04 + Wazuh Agent + Apache2
+
+─────────────────────────────────────────────────────────
+FLUJO DE DATOS (de evento a acción):
+─────────────────────────────────────────────────────────
+
+1. VM genera evento (ej: SSH failed login)
+        ↓
+2. Wazuh Agent captura log y lo envía al Manager
+        ↓ (port 1514/udp)
+3. Wazuh Manager procesa, normaliza y aplica reglas
+        ↓ (rule match: level 3+)
+4. Manager genera alerta y la envía vía HTTP POST
+        ↓ (webhook URL)
+5. Shuffle recibe la alerta en el Webhook
+        ↓
+6. Workflow se ejecuta (acciones configuradas)
+        ↓
+7. [Próximas iteraciones: bloqueos, notificaciones, etc.]
+```
+
+> **Tip:** Documentar el flujo de datos me ayudó a aislar problemas más rápido. Si no llega al webhook → falla en Wazuh o en red. Si llega pero no hay ejecución → revisar backend de Shuffle. Si ejecuta pero el resultado es vacío → revisar el workflow.
+
+## 6. Métricas y resultados
+
+**Tiempo de implementación:**
+
+- **Estimación inicial:** 2 horas
+- **Tiempo real:** ~3 horas (incluyendo troubleshooting)
+- **Breakdown:**
+  - Creación de LXC + instalación Docker: 20 min
+  - Deploy de Shuffle: 30 min
+  - Troubleshooting networking: 1.5 horas (!!)
+  - Integración con Wazuh: 30 min
+  - Testing y validación: 30 min
+
+**Recursos utilizados:**
+
+- **LXC Shuffle:** 2 GB RAM, 10 GB disco
+- **CPU usage:** <5% en idle, <20% procesando alertas
+- **Network:** ~100 KB/s durante picos de alertas
+- **Disk I/O:** Mínimo (OpenSearch escribe logs localmente)
+
+**Alertas procesadas durante testing:**
+
+- **SSH failed logins:** 5 eventos
+- **Sudo commands:** 3 eventos
+- **Wazuh started:** 1 evento (útil para validar conectividad)
+
+**Latencia end-to-end:**
+
+- Evento generado → Alerta en Shuffle: **<2 segundos**
+- Consistente en todos los tests
+
+> **Note:** Empecé con la expectativa de "2 horas y listo". La realidad (con troubleshooting de networking) fueron ~3 horas. Pero el valor es enorme: de cero a un SOAR funcional recibiendo alertas reales en una tarde.
+
+## 7. Lecciones aprendidas
+
+### Técnicas
+
+1. **LXC > VM para servicios Docker en homelab**  
+   Menor overhead, arranque instantáneo, mismo nivel de aislamiento para labs.
+
+2. **Nombres de contenedor > IPs en Docker**  
+   Docker DNS resuelve automáticamente. Hace el stack portable y fácil de reconfigurar.
+
+3. **Webhooks > APIs para integraciones simples**  
+   Para casos de "evento → acción", webhooks son más directos que polling de APIs.
+
+4. **`sed` es tu amigo cuando no hay editores**  
+   Aprendé los basics de `sed` para containers minimalistas. Ahorra tiempo.
+
+5. **Orborus es opcional al principio**  
+   Para validar el flujo de alertas, no necesitás que Orborus funcione perfectamente. Enfocate en el loop básico primero.
+
+### Arquitectura
+
+1. **Separar componentes = mayor modularidad**  
+   Wazuh en un LXC, Shuffle en otro. Puedo destruir uno sin afectar el otro.
+
+2. **IP estática es crítica para integraciones**  
+   DHCP puede cambiar IPs y romper webhooks. Siempre estático para servicios core.
+
+3. **Privileged containers habilitan Docker-in-Docker**  
+   Trade-off conocido: menos seguridad, más flexibilidad. Para labs está OK.
+
+4. **OpenSearch local > Elasticsearch cloud**  
+   Para prototipos rápidos, tener todo local es más simple y no genera costos.
+
+### Troubleshooting
+
+1. **Logs primero, siempre**  
+   `docker-compose logs` te da el 80% de la info que necesitás para debuggear.
+
+2. **Network issues = 90% de los problemas en Docker**  
+   Cuando algo no funciona, empezá por verificar: nombres DNS, rutas, firewalls.
+
+3. **Browser cache puede engañar**  
+   Modo incógnito (Ctrl+Shift+N) o hard refresh (Ctrl+Shift+R) evita falsos negativos.
+
+4. **`tail -f` > leer logs "muertos"**  
+   Ver logs en tiempo real te permite correlacionar acciones con resultados instantáneamente.
+
+> **Lesson Learned:** Cuando algo falle, **nombrá la hipótesis** que estás probando antes de ejecutar el siguiente comando. Te obliga a diseñar el diagnóstico con intención y reducís los "clicks al aire".
+
+## 8. Próximos pasos (teaser Semana 2)
+
+Con las alertas llegando a Shuffle, ya puedo construir **acciones reales** en workflows. Los próximos objetivos:
+
+**1. Playbook de auto-bloqueo de IPs**  
+SSH brute force → detectar → bloquear IP en firewall (iptables) → notificar.
+
+**2. Notificaciones contextualizadas a Slack**  
+Enviar alertas a un canal de Slack con información enriquecida (IP, país, etc.).
+
+**3. Enriquecimiento con AbuseIPDB**  
+Consultar reputación de IPs atacantes y agregar contexto de threat intelligence.
+
+**4. Dashboard de métricas de respuesta**  
+Visualizar: tiempo de respuesta, tipos de ataques bloqueados, IPs baneadas, etc.
+
+**Meta de Semana 2:**  
+Bajar el **MTTR** (Mean Time To Response) de ~5 minutos (manual) a **<10 segundos** (automático).
+
+> **Tip:** Si vas a bloquear IPs automáticamente, empezá en **modo "audit"** (log only) y después pasá a **mode "enforce"**. No querés bloquearte a vos mismo durante la demo ;)
+
+## 9. Recursos y referencias
+
+**Documentación oficial:**
+
+- [Shuffle Docs](https://shuffler.io/docs) - Guías, ejemplos de workflows
+- [Wazuh Integration Guide](https://documentation.wazuh.com/current/proof-of-concept-guide/integrate-external-tools.html) - Integración con herramientas externas
+- [Docker Compose](https://docs.docker.com/compose/) - Referencia completa
+
+**Comunidad:**
+
+- [Shuffle Discord](https://discord.gg/B2CBzUm) - Ayuda activa de la comunidad
+- [Wazuh Slack](https://wazuh.com/community/join-us-on-slack/) - Soporte oficial
+
+---
+
+## Apéndice: Comandos exactos (para copiar-pegar)
+
+### Docker + Compose en LXC
+
+```bash
+apt update && apt upgrade -y
+apt install -y docker.io docker-compose git curl
+
+systemctl start docker
+systemctl enable docker
+
+docker --version
+docker-compose --version
+```
+
+### Clonar y preparar Shuffle
+
+```bash
+cd /opt
+git clone https://github.com/Shuffle/Shuffle
+cd Shuffle
+
+# Copiar ejemplo de docker-compose
+cp docker-compose.yml docker-compose-working.yml
+
+# Editar según necesidad (ver sección 2.3)
+nano docker-compose-working.yml
+```
+
+### Levantar Shuffle
+
+```bash
+docker-compose -f docker-compose-working.yml up -d
+
+# Ver logs
+docker-compose -f docker-compose-working.yml logs -f
+
+# Verificar estado
+docker ps
+```
+
+### Crear Workflow con Webhook en Shuffle
+
+1. Dashboard → **Workflows** → **New Workflow**
+2. Name: `Test-Wazuh-Connection`
+3. Arrastrar **Webhook** al canvas
+4. Click en Webhook → **Show Execution Argument**
+5. Copiar URL: `http://192.168.0.123:3001/api/v1/hooks/webhook_XXXXX`
+
+### Integración en Wazuh (sin editores)
+
+```bash
+# Entrar al contenedor
+docker exec -it single-node-wazuh.manager-1 bash
+
+# Agregar integración con sed
+sed -i '/<\/cluster>/a\
+\  <integration>\
+    <name>shuffle</name>\
+    <hook_url>http://192.168.0.123:3001/api/v1/hooks/webhook_XXXXX</hook_url>\
+    <level>3</level>\
+    <alert_format>json</alert_format>\
+  </integration>' /var/ossec/etc/ossec.conf
+
+# Verificar config
+grep -A6 "shuffle" /var/ossec/etc/ossec.conf
+
+# Reiniciar Wazuh
+/var/ossec/bin/wazuh-control restart
+
+# Monitorear logs
+tail -f /var/ossec/logs/integrations.log
+```
+
+### Evento de prueba
+
+```bash
+# Desde tu PC/laptop
+ssh usuario_falso@192.168.0.121
+
+# Fallar password 3 veces → genera alerta en Wazuh → llega a Shuffle
+```
+
+### Verificar en Shuffle
+
+Dashboard → Workflows → Test-Wazuh-Connection → **Executions** → Ver última ejecución
+
+---
+
+**¿Preguntas, comentarios, sugerencias?**  
+Dejá tu feedback en los comentarios. Si te sirvió, compartilo con alguien que esté armando un lab similar.
+
+**Próximo post:** "Playbook automático: de SSH brute force a IP bloqueada en <10 segundos"
