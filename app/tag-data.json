@@ -1,6 +1,6 @@
 {
   "pentest": 1,
-  "lab": 1,
+  "lab": 2,
   "metasploitable-2": 1,
   "vsftpd": 1,
   "ingreslock": 1,
@@ -11,13 +11,15 @@
   "vnc": 1,
   "x11": 1,
   "proyecto": 1,
-  "tutorial": 1,
-  "siem": 1,
-  "wazuh": 1,
-  "proxmox": 1,
-  "docker": 1,
+  "tutorial": 2,
+  "siem": 2,
+  "wazuh": 2,
+  "proxmox": 2,
+  "docker": 2,
   "soc": 1,
   "home-lab": 1,
-  "soar": 1,
-  "serie-cobalto-sec": 1
+  "soar": 2,
+  "serie-cobalto-sec": 1,
+  "shuffle": 1,
+  "troubleshooting": 1
 }

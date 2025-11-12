@@ -22,7 +22,7 @@ Llegué con la expectativa ingenua de "plug & play en 2 horas". La realidad tuvo
 
 ## 1. Decisiones de arquitectura
 
-Antes de tirar comandos, paré a pensar **dónde** hospedar Shuffle. <Evalué> tres caminos y descarté dos.
+Antes de tirar comandos, paré a pensar **dónde** hospedar Shuffle. Evalué tres caminos y descarté dos.
 
 ### 1.1 Opciones evaluadas
 
@@ -576,13 +576,13 @@ FLUJO DE DATOS (de evento a acción):
 
 ### Técnicas
 
-1. **LXC > VM para servicios Docker en homelab**  
+1. **LXC mejor que VM para servicios Docker en homelab**  
    Menor overhead, arranque instantáneo, mismo nivel de aislamiento para labs.
 
-2. **Nombres de contenedor > IPs en Docker**  
+2. **Nombres de contenedor mejor que IPs en Docker**  
    Docker DNS resuelve automáticamente. Hace el stack portable y fácil de reconfigurar.
 
-3. **Webhooks > APIs para integraciones simples**  
+3. **Webhooks mejor que APIs para integraciones simples**  
    Para casos de "evento → acción", webhooks son más directos que polling de APIs.
 
 4. **`sed` es tu amigo cuando no hay editores**  
@@ -602,7 +602,7 @@ FLUJO DE DATOS (de evento a acción):
 3. **Privileged containers habilitan Docker-in-Docker**  
    Trade-off conocido: menos seguridad, más flexibilidad. Para labs está OK.
 
-4. **OpenSearch local > Elasticsearch cloud**  
+4. **OpenSearch local mejor que Elasticsearch cloud**  
    Para prototipos rápidos, tener todo local es más simple y no genera costos.
 
 ### Troubleshooting
@@ -616,7 +616,7 @@ FLUJO DE DATOS (de evento a acción):
 3. **Browser cache puede engañar**  
    Modo incógnito (Ctrl+Shift+N) o hard refresh (Ctrl+Shift+R) evita falsos negativos.
 
-4. **`tail -f` > leer logs "muertos"**  
+4. **`tail -f` mejor que leer logs "muertos"**  
    Ver logs en tiempo real te permite correlacionar acciones con resultados instantáneamente.
 
 > **Lesson Learned:** Cuando algo falle, **nombrá la hipótesis** que estás probando antes de ejecutar el siguiente comando. Te obliga a diseñar el diagnóstico con intención y reducís los "clicks al aire".
