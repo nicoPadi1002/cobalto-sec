@@ -1,1 +1,13 @@
-{}
+{
+  "pentest": 1,
+  "lab": 1,
+  "metasploitable-2": 1,
+  "vsftpd": 1,
+  "ingreslock": 1,
+  "tomcat": 1,
+  "mysql": 1,
+  "smb": 1,
+  "nfs": 1,
+  "vnc": 1,
+  "x11": 1
+}

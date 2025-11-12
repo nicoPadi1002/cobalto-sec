@@ -1,0 +1,561 @@
+---
+title: 'De Cero a SOC en 7 Días: Cómo Construí mi Sistema de Detección de Amenazas'
+date: '2025-11-11T00:00:00'
+lastmod: '2025-11-11T00:00:00'
+summary: 'Sprint profesional de 7 días: Wazuh sobre Proxmox y Docker, arquitectura LXC y smoke tests; proyecto orientado a empleabilidad y evidencias medibles.'
+tags:
+  [
+    'proyecto',
+    'tutorial',
+    'siem',
+    'wazuh',
+    'proxmox',
+    'docker',
+    'soc',
+    'home-lab',
+    'soar',
+    'serie-cobalto-sec',
+  ]
+draft: false
+authors: ['default']
+images: ['/static/images/soc-week01/dashboard-principal.png']
+---
+
+> **Note:** Este es el **primer post** de la serie _SOAR Inteligente_ (Semana 1/8), planteado como un **sprint profesional**. El objetivo es demostrar **criterio de arquitectura, troubleshooting y métricas** que interesan a un hiring manager.
+
+## 1. Hook: del plan al SOC operativo
+
+Arranqué un **sprint de 7 días** con un objetivo concreto: **desplegar un SOC funcional end‑to‑end** que evidencie decisiones técnicas, control de riesgos y resultados medibles.
+
+Hoy tengo un **Security Operations Center** casero detectando ataques en tiempo real, procesando **500+ eventos por hora** y alertando sobre comportamientos sospechosos en menos de **10 segundos**. Todo corre en **hardware reciclado**, **software open source** y consume **menos recursos** que una VM de Windows.
+
+Esta es la ruta que seguí (errores incluidos) y cómo podés replicarla.
+
+![Dashboard Wazuh mostrando eventos en tiempo real](/static/images/soc-week01/dashboard-principal.png)
+
+---
+
+## 2. El "por qué": valor para contratación
+
+Este proyecto está pensado para que un hiring manager pueda verificar **impacto** en los primeros 60 segundos:
+
+- **Arquitectura clara** (Proxmox + LXC + Docker + Wazuh)
+- **Métricas** verificables (500+ eventos/h, <10s latencia)
+- **Pruebas reproducibles** (smoke tests y runbook)
+
+### ¿Qué es un SIEM? (la analogía simple)
+
+Un SIEM es como un **sistema de cámaras inteligente** para tu infraestructura.
+
+- Las "cámaras" son los **logs**
+- La "analítica" es la **correlación** en tiempo real
+- El "guardia" es el **motor de alertas** que avisa durante el incidente
+
+**Ejemplo concreto:** 100 intentos fallidos de SSH en 2 minutos.
+
+- **Sin SIEM:** viven en `/var/log/auth.log`. Tal vez lo veas tarde
+- **Con SIEM:** se detecta el patrón "muchos fallos desde la misma IP en poco tiempo", eleva la alerta y, si querés, **bloquea automáticamente**
+
+> **Tip:** Trabajá siempre con **patrones** (reglas, correlaciones) antes que con eventos aislados. Ahorra ruido y te acerca a incidentes reales.
+
+---
+
+## 3. Decisiones de arquitectura: Proxmox + LXC + Docker + Wazuh
+
+Quería un stack **estable, barato y replicable**. Las decisiones clave fueron:
+
+1. **Proxmox** como hipervisor (en lugar de VMware/VirtualBox): enterprise-grade, gratuito, **backups y snapshots nativos**
+2. **LXC** para el manager de Wazuh (no VM): arranca en **2-3 segundos**, comparte kernel del host y gasta ~**300 MB** de RAM
+3. **Docker** **dentro** del LXC (sí, en capas): el despliegue oficial de Wazuh en contenedores funciona perfecto
+4. **Wazuh** como SIEM: 100% open source, docs claras, comunidad activa; evité Splunk por costos y ELK puro por complejidad
+
+### Virtualización: 3 niveles (y por qué elegí 2+3)
+
+```
+┌─────────────────────────────────┐
+│  Aplicación (Wazuh)             │
+└─────────────────────────────────┘
+         ↓ ¿Dónde corre?
+
+Nivel 1: Máquina Virtual (VM)
+├─ Sistema operativo completo
+├─ Kernel propio
+├─ Overhead: ~2GB RAM mínimo
+├─ Aislamiento: Máximo
+└─ Boot time: 30-60 segundos
+
+Nivel 2: LXC Container
+├─ Comparte kernel del host
+├─ Pero tiene systemd, SSH, cron
+├─ Overhead: ~300MB RAM
+├─ Aislamiento: Alto
+└─ Boot time: 2-3 segundos ← Elegí esto
+
+Nivel 3: Docker Container
+├─ Comparte kernel
+├─ Single-process por container
+├─ Overhead: ~100MB RAM
+├─ Aislamiento: Medio
+└─ Boot time: <1 segundo
+
+Mi setup: LXC (nivel 2) que CONTIENE Docker (nivel 3)
+Por qué: Balance perfecto para home lab
+```
+
+**Arquitectura final (Semana 1):**
+
+```
+┌──────────────────────────────────────┐
+│  Proxmox Host (192.168.0.115)        │
+│  - Hypervisor                        │
+│  - 8GB RAM, 2 cores dedicados        │
+└──────────────────────────────────────┘
+           ↓
+    ┌──────┴─────────┐
+    ↓                ↓
+┌─────────────┐  ┌─────────────┐
+│ LXC 100     │  │ VM 001      │
+│ Wazuh Mgr   │  │ Ubuntu      │
+│ 192.168.0.120│  │ Agent       │
+│             │  │ .121        │
+│ ├─ Docker   │  └─────────────┘
+│ ├─ Manager  │  ┌─────────────┐
+│ ├─ Indexer  │  │ VM 002      │
+│ └─ Dashboard│  │ Apache      │
+│             │  │ Agent       │
+└─────────────┘  │ .122        │
+                 └─────────────┘
+
+Recursos totales:
+- LXC: 4GB RAM, 30GB disco
+- VM1: 2GB RAM, 10GB disco
+- VM2: 2GB RAM, 10GB disco
+Total: 8GB RAM, 50GB disco
+```
+
+![Proxmox UI mostrando LXC y VMs](/static/images/soc-week01/proxmox-resources.png)
+
+> **Warning:** El stack con **OpenSearch/Elasticsearch** en el backend **come disco**. Calculá **30–50 GB** como mínimo para entornos chicos.
+
+---
+
+## 4. El deploy (con los tropiezos reales)
+
+No fue lineal. Esto fue lo que **terminó funcionando**:
+
+**Paso 1: Crear LXC en Proxmox**  
+LXC con 4GB RAM y 30GB disco; red puenteada para IP fija `192.168.0.120`.
+
+**Paso 2: Preparar para Docker**  
+Habilitar features necesarios y desplegar Docker dentro del LXC (omito pasos triviales del SO).
+
+**Paso 3: Desplegar Wazuh (single-node)**  
+Usé el despliegue en contenedores con `docker compose` apuntando a la **versión estable** (ver aprendizaje en Error #1).
+
+**Paso 4: Crear VMs agentes**  
+Dos VMs Ubuntu: `192.168.0.121` (agent general) y `192.168.0.122` (Apache).
+
+**Paso 5: Registrar agentes**  
+Alta manual y verificación con `agent_control`.
+
+### Errores que me enseñaron más que los aciertos
+
+#### Error #1: Versiones incompatibles
+
+**Problema:**
+
+- Instalé Wazuh Manager 4.14.0
+- Bug conocido en Filebeat
+- Indexer no recibía datos
+- Dashboard vacío
+
+**Diagnosis:**
+
+```bash
+docker logs single-node-wazuh.manager-1 | grep ERROR
+# Output: "Filebeat connection refused"
+```
+
+**Solución:**
+
+- **Downgrade a 4.9.2** (versión estable)
+- **Regenerar certificados SSL**
+- 2 horas perdidas, lección aprendida
+
+> **Lesson Learned:** "Latest" ≠ "mejor". Para producción casera, elegí **LTS/estable**.
+
+#### Error #2: Disco lleno
+
+**Síntoma:**
+
+```bash
+df -h
+# Output: /dev/mapper/pve-vm--100--disk--0  20G  19G  0  100% /
+```
+
+**Arreglo:**
+
+- Expandir disco en Proxmox (20GB → 30GB)
+- `resize2fs` dentro del LXC
+
+```bash
+resize2fs /dev/mapper/pve-vm--100--disk--0
+```
+
+> **Tip:** Planificá el **crecimiento del índice**. La ingesta de logs reales se acumula en días.
+
+#### Error #3: Agentes "Never connected"
+
+**Síntoma:**
+
+- El agente decía "Connected" en su log, pero el Manager lo listaba como "Never connected".
+
+**Comprobaciones:**
+
+```bash
+# En VM agente
+sudo tail -f /var/ossec/logs/ossec.log
+# "INFO: Connected to 192.168.0.120:1514"
+
+# En Manager
+docker exec -it single-node-wazuh.manager-1 \
+  /var/ossec/bin/agent_control -l
+# Agent 001: Never connected
+```
+
+**Causa raíz:** El agente **no estaba registrado** en el Manager.  
+**Solución:**
+
+```bash
+# Registrar manualmente
+docker exec -it single-node-wazuh.manager-1 \
+  /var/ossec/bin/manage_agents
+# A) Add agent
+# Name: wazuh-agent
+# IP: 192.168.0.121
+```
+
+> **Lesson Learned:** **Conectar** ≠ **Registrar**. Son pasos distintos.
+
+![Terminal mostrando error y solución](/static/images/soc-week01/error-agente-never-connected.png)
+
+---
+
+## 5. La primera detección real (SSH brute force)
+
+Con Wazuh up, agentes conectados y logs fluyendo, probé un test simple:
+
+**Simular brute force SSH:**
+
+```bash
+# Desde mi PC
+for i in {1..5}; do
+  ssh fake_user_$i@192.168.0.121
+  # Fallar password intencionalmente
+  sleep 2
+done
+```
+
+En `auth.log` del servidor:
+
+```
+Nov 11 10:30:15 wazuh-agent sshd[1234]: Failed password for invalid user fake_user_1 from 192.168.0.115
+Nov 11 10:30:17 wazuh-agent sshd[1235]: Failed password for invalid user fake_user_2 from 192.168.0.115
+Nov 11 10:30:19 wazuh-agent sshd[1236]: Failed password for invalid user fake_user_3 from 192.168.0.115
+Nov 11 10:30:21 wazuh-agent sshd[1237]: Failed password for invalid user fake_user_4 from 192.168.0.115
+Nov 11 10:30:23 wazuh-agent sshd[1238]: Failed password for invalid user fake_user_5 from 192.168.0.115
+```
+
+**Alerta generada (Wazuh):**
+
+- Rule ID: **5710** (SSH authentication failed)
+- Level: **5 (Medium)**
+- Count: **5 events**
+- Source IP: **192.168.0.115**
+- Target: **192.168.0.121**
+- Timestamp: **real-time**
+
+Y sí, **funcionó**. 🎉 Ese momento justifica horas de setup.
+
+![Alerta SSH rule 5710 en Wazuh](/static/images/soc-week01/alerta-ssh-5710.png)
+
+> **Tip:** Para _smoke tests_ reproducibles, guardá tus **consultas de Threat Hunting** (filtros por `rule.id`, `agent.name`, etc.).
+
+---
+
+## 6. Más allá de SSH: FIM, sudo y HTTP
+
+**1) File Integrity Monitoring (FIM)**  
+Monitoreo en: `/etc`, `/usr/bin`, `/usr/sbin`, `/var/www/html`.
+
+**Test FIM:**
+
+```bash
+sudo nano /etc/hosts
+# Agregar línea: # TEST FIM
+# Guardar
+```
+
+**Resultado (~2 min):**
+
+- Alerta: "Integrity checksum changed"
+- File: `/etc/hosts`
+- Level: **7 (High)**
+- Con **diff** de cambios
+
+**2) Comandos sudo sospechosos**  
+Wazuh registra comandos elevando contexto:
+
+```bash
+sudo cat /etc/shadow
+# Alerta: Level 3 (Low)
+# User accessed password file
+
+sudo nmap localhost
+# Alerta: Level 5 (Medium)
+# Port scanning detected
+```
+
+**3) Apache logs (VM 002)**  
+Simulo 404s para ver recon:
+
+```bash
+# Generar 404s masivos (simulación scan)
+for i in {1..6}; do
+  curl http://192.168.0.122/fake$i.php
+done
+```
+
+**Alerta:**
+
+- Rule ID: **31101**
+- "Web server 400 error code"
+- Count: **6** en **30** segundos
+- Patrón de **reconocimiento** (recon)
+
+![Múltiples tipos de alertas — SSH, FIM, sudo, HTTP](/static/images/soc-week01/alertas-multiples.png)
+
+> **Note:** Estos tests no buscan "romper" nada. Son señales controladas para verificar ingesta, normalización, correlación y alerta.
+
+---
+
+## 7. Métricas y estado actual (Semana 1)
+
+Después de 7 días corriendo:
+
+**Infraestructura**
+
+- Uptime: **99.8%** (1 reinicio por expansión de disco)
+- Eventos procesados: **~80,000**
+- Alertas generadas: **~150** (reales + pruebas)
+- Agentes activos: **2/2 (100%)**
+
+**Performance**
+
+- Latencia evento→alerta: **<2 s**
+- CPU promedio: **15–20%** (picos 40%)
+- RAM: **3.2 GB / 4 GB (80%)**
+- Disco: **16 GB / 30 GB (52%)**
+
+**Detección**
+
+- Intentos SSH: **45+**
+- Cambios FIM: **12**
+- Comandos sudo: **230+**
+- HTTP requests: **1,200+**
+
+**False positives:** ~**5%** (mayormente mis propias pruebas)
+
+**Tabla de control:**
+
+| Métrica          | Objetivo | Real  | Estado |
+| ---------------- | -------- | ----- | ------ |
+| Agentes activos  | 2        | 2     | ✅     |
+| Uptime           | 95%      | 99.8% | ✅     |
+| Tiempo respuesta | <10s     | <2s   | ✅     |
+| Eventos/hora     | 100+     | 500+  | ✅     |
+| Disk usage       | <80%     | 52%   | ✅     |
+
+![Gráficos de performance: CPU, RAM, eventos/tiempo](/static/images/soc-week01/metricas-performance.png)
+
+> **Tip:** Bajá el ruido con listas de **suppress/ignore** acotadas, no a ciegas. Empezá por fuentes hiper-verborreicas (p. ej., `auth.log` en brute force continuo).
+
+---
+
+## 8. Smoke tests (para que tu setup diga "estoy vivo")
+
+**Test 1: Proxmox accesible**
+
+```bash
+# Navegador
+https://192.168.0.115:8006
+```
+
+✅ Esperado: login de Proxmox
+
+**Test 2: Wazuh Dashboard UP**
+
+```bash
+# Navegador
+https://192.168.0.120:443
+```
+
+✅ Esperado: login de Wazuh  
+Credenciales: `admin / SecretPassword`
+
+**Test 3: Contenedores Docker corriendo**
+
+```bash
+# SSH al LXC
+ssh root@192.168.0.120
+
+# Ver contenedores
+cd /opt/wazuh-docker/wazuh-docker-4.9.2/single-node/
+docker compose ps
+```
+
+✅ Esperado:
+
+```
+NAME                              STATUS
+single-node-wazuh.dashboard-1     Up 2 days
+single-node-wazuh.indexer-1       Up 2 days
+single-node-wazuh.manager-1       Up 2 days
+```
+
+**Test 4: Agentes registrados y activos**
+
+```bash
+# En el LXC Manager
+docker exec -it single-node-wazuh.manager-1 \
+  /var/ossec/bin/agent_control -l
+```
+
+✅ Esperado:
+
+```
+Wazuh agent_control. List of available agents:
+   ID: 000, Name: wazuh.manager (server), IP: 127.0.0.1, Active/Local
+   ID: 001, Name: wazuh-agent, IP: 192.168.0.121, Active
+   ID: 002, Name: apache-server, IP: 192.168.0.122, Active
+```
+
+Keyword clave: **Active**
+
+**Test 5: Logs fluyendo**
+
+```
+Dashboard → Threat Hunting → Events
+Time range: Last 15 minutes
+```
+
+✅ Esperado: lista de eventos (mínimo 10+)  
+Eventos típicos: Login successful, Sudo command, File access, Network connection
+
+**Test 6: Alerta SSH (CRÍTICO)**
+
+```bash
+# Desde otra PC
+for i in {1..5}; do
+  timeout 3 ssh fake$i@192.168.0.121 2>/dev/null || true
+  sleep 1
+done
+```
+
+Luego en Dashboard → Events  
+Filtro: `rule.id:5710` (Last 5 minutes)  
+✅ Esperado: 5+ eventos, Level 5, "authentication failed", source = tu IP
+
+**Test 7: File Integrity Monitoring**
+
+```bash
+# SSH al agente
+ssh wazuh@192.168.0.121
+
+# Modificar archivo monitoreado
+sudo nano /etc/hosts
+# Agregar:
+# 127.0.0.1 test-fim
+```
+
+Esperar 2–5 min → Dashboard → Events → Filtro: `rule.groups:syscheck`  
+✅ Esperado: "Integrity checksum changed", file `/etc/hosts`, Level 7
+
+---
+
+## 9. Lo que aprendí (técnico y no técnico)
+
+**Técnico**
+
+1. **Arquitectura SIEM:** patrón agent–manager, normalización, correlación y severidad
+2. **Containerización en capas:** LXC vs Docker vs VM; cuándo conviene cada uno
+3. **Networking en Proxmox:** bridges (`vmbr0`), IPs fijas, y segmentación básica
+4. **Troubleshooting sistemático:** logs primero, dividir el problema, reproducir, documentar
+
+**No técnico**
+
+1. **Los errores son contenido.** Discos al 100% me enseñaron más que cualquier "happy path"
+2. **Versionado de configs.** Perdí reglas custom una vez; ahora, **backup** antes de cada cambio
+3. **Planificación antes de ejecutar.** Dibujar la arquitectura ahorra reprocesos
+4. **"Good enough" > perfecto.** Lanzar temprano te da feedback real
+
+> **Lesson Learned:** Si una métrica te importa, **definila y medila** desde el día 1 (uptime, eventos/h, FP%). Después sólo la vas afinando.
+
+---
+
+## 10. Próximos pasos (hoja de ruta de la serie)
+
+**Semana 1:** ✅ SIEM funcionando  
+**Semana 2:** **SOAR** con **Shuffle** (bloquear IP automáticamente ante brute force)  
+Semanas 3–8: **Threat Intelligence (MISP)**, **detección con ML**, **NLP/LLM local**, **honeypots**, **Grafana**, **hardening** y **lanzamiento público**.
+
+**Meta final del proyecto:**
+
+1. Detectar amenazas (**hecho**)
+2. **Responder automáticamente** (la próxima)
+3. Aprender de patrones (ML)
+4. Mejorar solo (feedback loop)
+
+---
+
+## 11. Cierre
+
+De un **plan** a un **SOC operativo** en 7 días.  
+Hardware: reciclado. Software: open source. Proceso: documentado y medible.
+
+La próxima semana, este SIEM **se defiende solo**.
+
+**¿Te sirvió esto?** Dame feedback por [LinkedIn](#) o [GitHub](#).  
+**¿Te trabaste en algún paso?** Comentá el error específico y lo debuggeamos juntos.  
+Si querés el **repo completo** con configs y scripts, comentá "REPO" abajo o etiquetame.
+
+**Serie SOAR Inteligente**
+
+- ✅ Semana 1: SIEM básico (este post)
+- 🔜 Semana 2: SOAR – Automatización
+- 🔜 Semana 3: Threat Intelligence
+- 🔜 Semanas 4–8: ML, NLP, Honeypots, Dashboards
+
+**Recursos**
+
+- [Wazuh Documentation](https://documentation.wazuh.com/)
+- [Proxmox VE](https://www.proxmox.com/)
+- Mi GitHub con configs (próximo post)
+- Diagrama de arquitectura (próximo commit)
+
+---
+
+## Apéndice: Checklist de screenshots necesarios (calidad ≥1080p, PNG)
+
+**CRÍTICOS (necesarios para MVP):**
+
+1. ✅ Dashboard principal Wazuh mostrando eventos
+2. ✅ Proxmox UI (LXC + VMs con recursos)
+3. ✅ Alerta SSH (rule 5710) — LA MÁS IMPORTANTE
+4. ✅ Terminal con error y solución
+5. ✅ Métricas de performance (CPU, RAM, eventos)
+
+**OPCIONALES (agregar después):** 6. Múltiples tipos de alertas (FIM, sudo, HTTP)  
+7. Smoke test checkpoints (Docker ps, agent_control -l)
+
+> **Tip:** Usá **ShareX / Flameshot / Greenshot** y anotaciones (flechas y círculos). La documentación clara es parte del valor del proyecto.
