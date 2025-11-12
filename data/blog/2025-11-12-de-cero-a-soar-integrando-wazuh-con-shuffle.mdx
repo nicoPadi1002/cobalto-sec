@@ -555,7 +555,7 @@ FLUJO DE DATOS (de evento a acción):
 **Recursos utilizados:**
 
 - **LXC Shuffle:** 2 GB RAM, 10 GB disco
-- **CPU usage:** <5% en idle, <20% procesando alertas
+- **CPU usage:** menos de 5% en idle, menos de 20% procesando alertas
 - **Network:** ~100 KB/s durante picos de alertas
 - **Disk I/O:** Mínimo (OpenSearch escribe logs localmente)
 
@@ -567,7 +567,7 @@ FLUJO DE DATOS (de evento a acción):
 
 **Latencia end-to-end:**
 
-- Evento generado → Alerta en Shuffle: **<2 segundos**
+- Evento generado → Alerta en Shuffle: ** menos de 2 segundos**
 - Consistente en todos los tests
 
 > **Note:** Empecé con la expectativa de "2 horas y listo". La realidad (con troubleshooting de networking) fueron ~3 horas. Pero el valor es enorme: de cero a un SOAR funcional recibiendo alertas reales en una tarde.
@@ -638,7 +638,7 @@ Consultar reputación de IPs atacantes y agregar contexto de threat intelligence
 Visualizar: tiempo de respuesta, tipos de ataques bloqueados, IPs baneadas, etc.
 
 **Meta de Semana 2:**  
-Bajar el **MTTR** (Mean Time To Response) de ~5 minutos (manual) a **<10 segundos** (automático).
+Bajar el **MTTR** (Mean Time To Response) de ~5 minutos (manual) a ** menos de 10 segundos** (automático).
 
 > **Tip:** Si vas a bloquear IPs automáticamente, empezá en **modo "audit"** (log only) y después pasá a **mode "enforce"**. No querés bloquearte a vos mismo durante la demo ;)
 
@@ -749,4 +749,4 @@ Dashboard → Workflows → Test-Wazuh-Connection → **Executions** → Ver úl
 **¿Preguntas, comentarios, sugerencias?**  
 Dejá tu feedback en los comentarios. Si te sirvió, compartilo con alguien que esté armando un lab similar.
 
-**Próximo post:** "Playbook automático: de SSH brute force a IP bloqueada en <10 segundos"
+**Próximo post:** "Playbook automático: de SSH brute force a IP bloqueada en menos de 10 segundos"
