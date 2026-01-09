@@ -15,32 +15,26 @@ const Header = () => {
   return (
     <header className={headerClass}>
       <Link href="/" aria-label={siteMetadata.headerTitle}>
-        <div className="flex items-center justify-between">
-          <div className="mr-3">
-            <Logo />
-          </div>
-          {typeof siteMetadata.headerTitle === 'string' ? (
-            <div className="hidden h-6 text-2xl font-semibold sm:block">
-              {siteMetadata.headerTitle}
-            </div>
-          ) : (
-            siteMetadata.headerTitle
-          )}
+        <div className="flex items-center">
+          <Logo />
         </div>
       </Link>
-      <div className="flex items-center space-x-4 leading-5 sm:-mr-6 sm:space-x-6">
-        <div className="no-scrollbar hidden max-w-40 items-center gap-x-4 overflow-x-auto sm:flex md:max-w-72 lg:max-w-96">
+      <div className="flex items-center space-x-3 leading-5 sm:space-x-5">
+        <div className="no-scrollbar hidden max-w-40 items-center gap-x-5 overflow-x-auto sm:flex md:max-w-72 lg:max-w-96">
           {headerNavLinks
             .filter((link) => link.href !== '/')
-            .map((link) => (
-              <Link
-                key={link.title}
-                href={link.href}
-                className="hover:text-primary-500 dark:hover:text-primary-400 m-1 font-medium text-gray-900 dark:text-gray-100"
-              >
-                {link.title}
-              </Link>
-            ))}
+            .map((link) => {
+              const isProjects = link.href === '/projects'
+              return (
+                <Link
+                  key={link.title}
+                  href={link.href}
+                  className={`font-medium whitespace-nowrap transition-colors ${isProjects ? 'text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300' : 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100'}`}
+                >
+                  {link.title}
+                </Link>
+              )
+            })}
         </div>
         <SearchButton />
         <ThemeSwitch />

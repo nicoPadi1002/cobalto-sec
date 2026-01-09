@@ -1,26 +1,22 @@
 interface Project {
   title: string
   description: string
-  href?: string
-  imgSrc?: string
+  imgSrc: string
+  href: string
+  github?: string
+  status: 'active' | 'completed' | 'in-progress'
+  tags: string[]
 }
 
 const projectsData: Project[] = [
   {
-    title: 'A Search Engine',
-    description: `What if you could look up any information in the world? Webpages, images, videos
-    and more. Google has many features to help you find exactly what you're looking
-    for.`,
-    imgSrc: '/static/images/google.png',
-    href: 'https://www.google.com',
-  },
-  {
-    title: 'The Time Machine',
-    description: `Imagine being able to travel back in time or to the future. Simple turn the knob
-    to the desired date and press "Go". No more worrying about lost keys or
-    forgotten headphones with this simple yet affordable solution.`,
-    imgSrc: '/static/images/time-machine.jpg',
-    href: '/blog/the-time-machine',
+    title: 'HoneyAI',
+    description:
+      'Sistema de detección y análisis de amenazas que combina un honeypot SSH de media interacción con inteligencia artificial local para clasificar atacantes en tiempo real. Infraestructura en producción capturando ataques reales 24/7.',
+    imgSrc: '/static/images/projects/honeyai.png',
+    href: '/blog/2026-01-07-honeyai-honeypot-ssh-ia-local',
+    status: 'active',
+    tags: ['Cowrie', 'Ollama', 'n8n', 'Grafana', 'Loki', 'Proxmox', 'Threat Intelligence'],
   },
 ]
 

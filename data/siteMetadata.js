@@ -25,7 +25,7 @@ const siteMetadata = {
   // twitter: "",
   facebook: '',
   youtube: '',
-  linkedin: '',
+  linkedin: 'https://www.linkedin.com/in/nicopadilla-sec/',
   threads: '',
   instagram: '',
   medium: '',
