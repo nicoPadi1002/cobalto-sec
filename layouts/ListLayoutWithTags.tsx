@@ -158,7 +158,7 @@ export default function ListLayoutWithTags({
           ) : (
             <div className="grid gap-6 md:grid-cols-2">
               {displayPosts.map((post) => (
-                <BlogCard key={post._id} post={post as Blog} />
+                <BlogCard key={post.slug} post={post as Blog} />
               ))}
             </div>
           )}
