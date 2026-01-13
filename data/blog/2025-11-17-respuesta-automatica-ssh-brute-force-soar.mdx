@@ -20,6 +20,7 @@ images:
   [
     '/images/blog/2025-11-17-respuesta-automatica-ssh-brute-force-soar/21_shuffle_execution_success.png',
   ]
+project: 'wazuh-soar'
 ---
 
 > **Resumen ejecutivo:** En este tutorial construyo una respuesta automática a ataques SSH brute force que va desde la alerta en **Wazuh** hasta el **bloqueo de IP con iptables** orquestado por **Shuffle SOAR**. El objetivo es que, en **menos de 15 segundos**, el sistema pase de _detectar_ a _mitigar_ sin intervención humana. Comparto arquitectura, código completo, decisiones de diseño, pruebas end‑to‑end y el troubleshooting real que me encontré.
