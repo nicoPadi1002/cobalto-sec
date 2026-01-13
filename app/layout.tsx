@@ -68,16 +68,61 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${space_grotesk.variable} scroll-smooth`}
       suppressHydrationWarning
     >
-      <body className="bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
+      <body className="relative bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
+        {/* Circuit pattern background */}
+        <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.015] dark:opacity-[0.025]">
+          <svg width="100%" height="100%">
+            <defs>
+              <pattern
+                id="circuit"
+                x="0"
+                y="0"
+                width="100"
+                height="100"
+                patternUnits="userSpaceOnUse"
+              >
+                {/* Horizontal lines */}
+                <line x1="0" y1="20" x2="100" y2="20" stroke="currentColor" strokeWidth="1" />
+                <line x1="0" y1="80" x2="100" y2="80" stroke="currentColor" strokeWidth="1" />
+
+                {/* Vertical lines */}
+                <line x1="20" y1="0" x2="20" y2="100" stroke="currentColor" strokeWidth="1" />
+                <line x1="80" y1="0" x2="80" y2="100" stroke="currentColor" strokeWidth="1" />
+
+                {/* Corner connections */}
+                <line x1="20" y1="20" x2="30" y2="20" stroke="currentColor" strokeWidth="1" />
+                <line x1="70" y1="20" x2="80" y2="20" stroke="currentColor" strokeWidth="1" />
+                <line x1="20" y1="80" x2="30" y2="80" stroke="currentColor" strokeWidth="1" />
+                <line x1="70" y1="80" x2="80" y2="80" stroke="currentColor" strokeWidth="1" />
+
+                {/* Circuit nodes (small circles) */}
+                <circle cx="20" cy="20" r="2" fill="currentColor" />
+                <circle cx="80" cy="20" r="2" fill="currentColor" />
+                <circle cx="20" cy="80" r="2" fill="currentColor" />
+                <circle cx="80" cy="80" r="2" fill="currentColor" />
+                <circle cx="50" cy="50" r="1.5" fill="currentColor" />
+              </pattern>
+            </defs>
+            <rect
+              width="100%"
+              height="100%"
+              fill="url(#circuit)"
+              className="text-gray-900 dark:text-gray-100"
+            />
+          </svg>
+        </div>
+
         <ThemeProviders>
           <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
-          <SectionContainer>
-            <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
-              <Header />
-              <main className="mb-auto">{children}</main>
-            </SearchProvider>
-            <Footer />
-          </SectionContainer>
+          <div className="relative z-10">
+            <SectionContainer>
+              <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
+                <Header />
+                <main className="mb-auto">{children}</main>
+              </SearchProvider>
+              <Footer />
+            </SectionContainer>
+          </div>
         </ThemeProviders>
       </body>
     </html>
