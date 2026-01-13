@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Stats from './Stats'
 
 export default function Hero() {
   return (
@@ -14,6 +15,9 @@ export default function Hero() {
             de SOC y análisis de seguridad ofensiva.
           </p>
         </div>
+
+        {/* Stats Section */}
+        <Stats />
 
         <div className="mt-8 flex flex-wrap gap-2">
           <span className="inline-flex items-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">

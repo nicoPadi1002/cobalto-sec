@@ -1,0 +1,88 @@
+export default function TechStack() {
+  const technologies = [
+    // Security & Monitoring
+    { name: 'Wazuh', category: 'SIEM', description: 'SIEM open source para detección de amenazas' },
+    {
+      name: 'Shuffle',
+      category: 'SOAR',
+      description: 'Plataforma SOAR para automatización de respuestas',
+    },
+    {
+      name: 'Cowrie',
+      category: 'Honeypot',
+      description: 'Honeypot SSH/Telnet de media interacción',
+    },
+    {
+      name: 'MISP',
+      category: 'Threat Intel',
+      description: 'Plataforma de threat intelligence compartida',
+    },
+
+    // Infrastructure
+    {
+      name: 'Proxmox',
+      category: 'Virtualization',
+      description: 'Hipervisor enterprise open source',
+    },
+    { name: 'Docker', category: 'Containers', description: 'Containerización y microservicios' },
+    { name: 'LXC', category: 'Containers', description: 'Contenedores ligeros a nivel de SO' },
+
+    // Automation & Dev
+    { name: 'Python', category: 'Development', description: 'Scripting y automatización' },
+    { name: 'Bash', category: 'Scripting', description: 'Automatización de sistemas Linux' },
+    { name: 'n8n', category: 'Automation', description: 'Workflow automation self-hosted' },
+
+    // Observability
+    {
+      name: 'Grafana',
+      category: 'Visualization',
+      description: 'Dashboards y visualización de datos',
+    },
+    { name: 'Loki', category: 'Logging', description: 'Sistema de logs optimizado' },
+    { name: 'Ollama', category: 'AI/ML', description: 'Modelos LLM locales para análisis' },
+  ]
+
+  return (
+    <section className="border-b py-16">
+      <div className="mx-auto max-w-4xl px-4">
+        <div className="mb-10 text-center">
+          <h2 className="text-3xl font-bold tracking-tight">Stack Tecnológico</h2>
+          <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
+            Herramientas y plataformas que uso en producción
+          </p>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-3">
+          {technologies.map((tech) => (
+            <div
+              key={tech.name}
+              className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white px-4 py-2.5 shadow-sm transition-all hover:scale-105 hover:shadow-md dark:border-gray-800 dark:bg-gray-900"
+              title={tech.description}
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {tech.name}
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{tech.category}</span>
+              </div>
+              {/* Hover effect */}
+              <div className="absolute inset-0 -z-10 bg-gradient-to-r from-sky-50 to-blue-50 opacity-0 transition-opacity group-hover:opacity-100 dark:from-sky-950 dark:to-blue-950" />
+
+              {/* Tooltip on hover */}
+              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-lg bg-gray-900 px-3 py-2 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 sm:block dark:bg-gray-100 dark:text-gray-900">
+                {tech.description}
+                <div className="absolute top-full left-1/2 h-0 w-0 -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-100" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Open source, self-hosted, en producción 24/7
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}

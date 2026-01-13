@@ -46,6 +46,9 @@
   --z-60: 60;
   --z-70: 70;
   --z-80: 80;
+
+  /* Custom animations */
+  --animate-fade-in: fade-in 0.7s ease-out forwards;
 }
 
 @layer base {
@@ -67,6 +70,10 @@
     outline: 2px solid;
     border-radius: var(--radius-sm);
     outline-color: var(--color-primary-500);
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 }
 
@@ -106,6 +113,22 @@
     & :where(h1, h2, h3, h4, h5, h6) {
       color: var(--color-gray-100);
     }
+  }
+
+  /* Animación fade-in */
+  .animate-fade-in {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    transform: translateX(0) !important;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 

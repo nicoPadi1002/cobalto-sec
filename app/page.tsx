@@ -3,7 +3,11 @@ import type { Metadata } from 'next'
 import siteMetadata from '@/data/siteMetadata'
 import { allBlogs } from 'contentlayer/generated'
 import Hero from '@/components/Hero'
+import FeaturedProjects from '@/components/FeaturedProjects'
+import TechStack from '@/components/TechStack'
 import AboutPreview from '@/components/AboutPreview'
+import BlogCard from '@/components/BlogCard'
+import FadeIn from '@/components/FadeIn'
 
 export const metadata: Metadata = {
   title: 'Inicio',
@@ -19,9 +23,20 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <AboutPreview />
 
-      <main className="mx-auto max-w-3xl px-4 py-10">
+      <FadeIn>
+        <FeaturedProjects />
+      </FadeIn>
+
+      <FadeIn delay={100}>
+        <TechStack />
+      </FadeIn>
+
+      <FadeIn delay={200}>
+        <AboutPreview />
+      </FadeIn>
+
+      <main className="mx-auto max-w-4xl px-4 py-10">
         {posts.length === 0 ? (
           <section
             aria-label="Sin publicaciones"
@@ -41,54 +56,31 @@ export default function HomePage() {
             </p>
           </section>
         ) : (
-          <>
-            <header className="mb-6">
-              <h2 className="text-2xl font-bold tracking-tight">Últimos Artículos</h2>
+          <FadeIn delay={300}>
+            <header className="mb-8">
+              <h2 className="text-3xl font-bold tracking-tight">Últimos Artículos</h2>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
+                Tutoriales técnicos, proyectos y análisis de seguridad
+              </p>
             </header>
 
-            <section aria-label="Últimas publicaciones" className="grid gap-6 sm:grid-cols-2">
-              {posts.map((post) => {
-                const href = post.path?.startsWith('/') ? post.path : `/${post.path}`
-                const date = new Date(post.date).toLocaleDateString('es-AR', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                })
-                return (
-                  <article
-                    key={post._id}
-                    className="flex flex-col rounded-2xl border p-5 transition-shadow hover:shadow-md"
-                  >
-                    <h3 className="text-xl font-semibold">
-                      <Link href={href} className="hover:underline">
-                        {post.title}
-                      </Link>
-                    </h3>
-                    <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">{date}</div>
-                    {post.summary ? (
-                      <p className="mt-3 flex-grow text-gray-700 dark:text-gray-300">
-                        {post.summary}
-                      </p>
-                    ) : null}
-                    <div className="mt-4">
-                      <Link
-                        href={href}
-                        className="text-sm font-medium text-sky-600 hover:underline dark:text-sky-400"
-                      >
-                        Leer más →
-                      </Link>
-                    </div>
-                  </article>
-                )
-              })}
+            <section aria-label="Últimas publicaciones" className="grid gap-6 md:grid-cols-2">
+              {posts.map((post, idx) => (
+                <FadeIn key={post._id} delay={350 + idx * 50}>
+                  <BlogCard post={post} />
+                </FadeIn>
+              ))}
             </section>
 
-            <div className="mt-8">
-              <Link href="/blog" className="text-sm font-medium text-sky-600 hover:underline">
-                Ver todas las entradas →
+            <div className="mt-10 text-center">
+              <Link
+                href="/blog"
+                className="inline-flex items-center rounded-lg bg-sky-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-sky-700"
+              >
+                Ver Todos los Artículos
               </Link>
             </div>
-          </>
+          </FadeIn>
         )}
       </main>
     </>
