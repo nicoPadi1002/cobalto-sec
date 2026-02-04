@@ -43,7 +43,7 @@ export default function AboutPreview() {
           <div className="pt-2">
             <Link
               href="/about"
-              className="text-sm font-medium text-sky-600 hover:underline dark:text-sky-400"
+              className="link-underline text-sm font-medium text-red-500 dark:text-red-400"
             >
               Conocer más →
             </Link>

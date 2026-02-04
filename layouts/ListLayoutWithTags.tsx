@@ -44,7 +44,7 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
           <Link
             href={currentPage - 1 === 1 ? `/${basePath}/` : `/${basePath}/page/${currentPage - 1}`}
             rel="prev"
-            className="rounded-lg bg-sky-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-sky-700"
+            className="rounded-lg bg-red-500 px-4 py-2 font-semibold text-white transition-all hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/20"
           >
             Anterior
           </Link>
@@ -64,7 +64,7 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
           <Link
             href={`/${basePath}/page/${currentPage + 1}`}
             rel="next"
-            className="rounded-lg bg-sky-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-sky-700"
+            className="rounded-lg bg-red-500 px-4 py-2 font-semibold text-white transition-all hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/20"
           >
             Siguiente
           </Link>
@@ -103,7 +103,7 @@ export default function ListLayoutWithTags({
             <h3 className="mb-4 text-lg font-bold">Filtrar por Tag</h3>
 
             {pathname.startsWith('/blog') ? (
-              <div className="mb-3 rounded-lg bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
+              <div className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 dark:bg-red-950/30 dark:text-red-400">
                 Todos ({posts.length})
               </div>
             ) : (
@@ -121,7 +121,7 @@ export default function ListLayoutWithTags({
                 return (
                   <li key={t}>
                     {isActive ? (
-                      <div className="rounded-lg bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
+                      <div className="rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 dark:bg-red-950/30 dark:text-red-400">
                         #{t} ({tagCounts[t]})
                       </div>
                     ) : (
@@ -140,7 +140,7 @@ export default function ListLayoutWithTags({
             {sortedTags.length > 15 && (
               <Link
                 href="/tags"
-                className="mt-4 block text-sm font-medium text-sky-600 hover:underline dark:text-sky-400"
+                className="link-underline mt-4 block text-sm font-medium text-red-500 dark:text-red-400"
               >
                 Ver todos los tags →
               </Link>

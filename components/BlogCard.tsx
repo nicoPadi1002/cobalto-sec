@@ -30,7 +30,7 @@ export default function BlogCard({ post }: BlogCardProps) {
   // Generar color basado en el título para placeholders
   const getGradientFromTitle = (title: string) => {
     const colors = [
-      'from-sky-500 to-blue-600',
+      'from-red-500 to-orange-600',
       'from-purple-500 to-pink-600',
       'from-green-500 to-teal-600',
       'from-orange-500 to-red-600',
@@ -41,7 +41,7 @@ export default function BlogCard({ post }: BlogCardProps) {
   }
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-red-500/30 dark:hover:shadow-red-500/10">
       {/* Thumbnail o Placeholder */}
       <Link href={href} className="relative aspect-video overflow-hidden bg-gray-100">
         {hasValidImage ? (
@@ -88,7 +88,7 @@ export default function BlogCard({ post }: BlogCardProps) {
         </div>
 
         {/* Título */}
-        <h3 className="mb-3 text-xl leading-tight font-bold tracking-tight group-hover:text-sky-600 dark:group-hover:text-sky-400">
+        <h3 className="mb-3 text-xl leading-tight font-bold tracking-tight group-hover:text-red-500 dark:group-hover:text-red-400">
           <Link href={href}>{post.title}</Link>
         </h3>
 
@@ -106,7 +106,7 @@ export default function BlogCard({ post }: BlogCardProps) {
               <Link
                 key={tag}
                 href={`/tags/${tag}`}
-                className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-sky-300 hover:bg-sky-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-sky-700 dark:hover:bg-sky-900/30"
+                className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-red-400/50 hover:bg-red-50 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-300 dark:hover:border-red-500/30 dark:hover:bg-red-950/30"
               >
                 #{tag}
               </Link>
@@ -123,7 +123,7 @@ export default function BlogCard({ post }: BlogCardProps) {
         <div>
           <Link
             href={href}
-            className="inline-flex items-center text-sm font-semibold text-sky-600 hover:underline dark:text-sky-400"
+            className="link-underline inline-flex items-center text-sm font-semibold text-red-500 dark:text-red-400"
           >
             Leer más →
           </Link>

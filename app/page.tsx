@@ -75,7 +75,7 @@ export default function HomePage() {
             <div className="mt-10 text-center">
               <Link
                 href="/blog"
-                className="inline-flex items-center rounded-lg bg-sky-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-sky-700"
+                className="inline-flex items-center rounded-lg bg-red-500 px-6 py-3 text-base font-semibold text-white shadow-sm transition-all hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/20"
               >
                 Ver Todos los Artículos
               </Link>

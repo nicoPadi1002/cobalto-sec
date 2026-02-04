@@ -104,9 +104,9 @@ export default function ServicesPage() {
         {services.map((service) => (
           <div
             key={service.title}
-            className="group rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
+            className="group rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-300 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-red-500/30 dark:hover:shadow-red-500/10"
           >
-            <div className="mb-4 inline-flex rounded-lg bg-sky-50 p-3 text-sky-600 dark:bg-sky-950 dark:text-sky-400">
+            <div className="mb-4 inline-flex rounded-lg bg-red-50 p-3 text-red-500 dark:bg-red-950/30 dark:text-red-400">
               {service.icon}
             </div>
 
@@ -124,7 +124,7 @@ export default function ServicesPage() {
                     key={item}
                     className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
                   >
-                    <span className="h-1 w-1 rounded-full bg-sky-500" />
+                    <span className="h-1 w-1 rounded-full bg-red-500" />
                     {item}
                   </li>
                 ))}
@@ -148,7 +148,9 @@ export default function ServicesPage() {
               key={phase.step}
               className="rounded-xl border border-gray-200 p-4 dark:border-gray-800"
             >
-              <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">{phase.step}</p>
+              <p className="font-mono text-2xl font-bold text-red-500 dark:text-red-400">
+                {phase.step}
+              </p>
               <p className="mt-1 font-semibold">{phase.title}</p>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{phase.description}</p>
             </div>
@@ -166,7 +168,7 @@ export default function ServicesPage() {
         <div className="mt-6 flex flex-wrap justify-center gap-4">
           <Link
             href="mailto:nicolas.cobaltosec@gmail.com"
-            className="inline-flex items-center rounded-lg bg-sky-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-sky-700"
+            className="inline-flex items-center rounded-lg bg-red-500 px-6 py-3 text-base font-semibold text-white shadow-sm transition-all hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/20"
           >
             Contactar
           </Link>

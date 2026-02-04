@@ -27,7 +27,7 @@ export default function Footer() {
                   href={siteMetadata.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+                  className="text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
                   aria-label="GitHub"
                 >
                   <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
@@ -44,7 +44,7 @@ export default function Footer() {
                   href={siteMetadata.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+                  className="text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
                   aria-label="LinkedIn"
                 >
                   <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
@@ -54,7 +54,7 @@ export default function Footer() {
               )}
               <a
                 href="mailto:nicolas.cobaltosec@gmail.com"
-                className="text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+                className="text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
                 aria-label="Email"
               >
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,31 +77,31 @@ export default function Footer() {
             <nav className="flex flex-col gap-2">
               <Link
                 href="/services"
-                className="text-sm text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
               >
                 Servicios
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
               >
                 Blog
               </Link>
               <Link
                 href="/projects"
-                className="text-sm text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
               >
                 Proyectos
               </Link>
               <Link
                 href="/tags"
-                className="text-sm text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
               >
                 Etiquetas
               </Link>
               <Link
                 href="/about"
-                className="text-sm text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
               >
                 Acerca
               </Link>
@@ -116,19 +116,19 @@ export default function Footer() {
             <div className="flex flex-col gap-2">
               <a
                 href="/feed.xml"
-                className="text-sm text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
               >
                 RSS Feed
               </a>
               <a
                 href="/sitemap.xml"
-                className="text-sm text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
               >
                 Sitemap
               </a>
               <Link
                 href="/tags"
-                className="text-sm text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
               >
                 Todos los Tags
               </Link>
@@ -148,7 +148,7 @@ export default function Footer() {
                 href="https://nextjs.org"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-sky-600 hover:underline dark:text-sky-400"
+                className="font-medium text-red-500 hover:underline dark:text-red-400"
               >
                 Next.js
               </a>{' '}
@@ -157,7 +157,7 @@ export default function Footer() {
                 href="https://tailwindcss.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-sky-600 hover:underline dark:text-sky-400"
+                className="font-medium text-red-500 hover:underline dark:text-red-400"
               >
                 Tailwind CSS
               </a>

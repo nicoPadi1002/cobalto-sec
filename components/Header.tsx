@@ -7,9 +7,10 @@ import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
 
 const Header = () => {
-  let headerClass = 'flex items-center w-full bg-white dark:bg-gray-950 justify-between py-10'
+  let headerClass = 'flex items-center w-full justify-between py-6 transition-all duration-300'
   if (siteMetadata.stickyNav) {
-    headerClass += ' sticky top-0 z-50'
+    headerClass +=
+      ' sticky top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-gray-950/80 border-b border-transparent dark:border-gray-800/50'
   }
 
   return (
@@ -24,12 +25,12 @@ const Header = () => {
           {headerNavLinks
             .filter((link) => link.href !== '/')
             .map((link) => {
-              const isProjects = link.href === '/projects'
+              const isServices = link.href === '/services'
               return (
                 <Link
                   key={link.title}
                   href={link.href}
-                  className={`font-medium whitespace-nowrap transition-colors ${isProjects ? 'text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300' : 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100'}`}
+                  className={`link-underline font-medium whitespace-nowrap ${isServices ? 'text-red-500 hover:text-red-400 dark:text-red-400 dark:hover:text-red-300' : 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100'}`}
                 >
                   {link.title}
                 </Link>

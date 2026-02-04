@@ -4,7 +4,7 @@ import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
-import { Space_Grotesk } from 'next/font/google'
+import { Space_Grotesk, JetBrains_Mono } from 'next/font/google'
 import { Analytics, type AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, type SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
@@ -18,6 +18,12 @@ const space_grotesk = Space_Grotesk({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-space-grotesk',
+})
+
+const jetbrains_mono = JetBrains_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-jetbrains-mono',
 })
 
 export const metadata: Metadata = {
@@ -65,13 +71,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${space_grotesk.variable} scroll-smooth`}
+      className={`${space_grotesk.variable} ${jetbrains_mono.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <body className="relative bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
         {/* Circuit pattern background */}
-        <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.015] dark:opacity-[0.025]">
-          <svg width="100%" height="100%">
+        <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] dark:opacity-[0.06]">
+          <svg width="200%" height="200%" className="animate-circuit-drift">
             <defs>
               <pattern
                 id="circuit"
@@ -82,32 +88,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 patternUnits="userSpaceOnUse"
               >
                 {/* Horizontal lines */}
-                <line x1="0" y1="20" x2="100" y2="20" stroke="currentColor" strokeWidth="1" />
-                <line x1="0" y1="80" x2="100" y2="80" stroke="currentColor" strokeWidth="1" />
+                <line x1="0" y1="20" x2="100" y2="20" stroke="currentColor" strokeWidth="0.5" />
+                <line x1="0" y1="80" x2="100" y2="80" stroke="currentColor" strokeWidth="0.5" />
 
                 {/* Vertical lines */}
-                <line x1="20" y1="0" x2="20" y2="100" stroke="currentColor" strokeWidth="1" />
-                <line x1="80" y1="0" x2="80" y2="100" stroke="currentColor" strokeWidth="1" />
+                <line x1="20" y1="0" x2="20" y2="100" stroke="currentColor" strokeWidth="0.5" />
+                <line x1="80" y1="0" x2="80" y2="100" stroke="currentColor" strokeWidth="0.5" />
 
                 {/* Corner connections */}
-                <line x1="20" y1="20" x2="30" y2="20" stroke="currentColor" strokeWidth="1" />
-                <line x1="70" y1="20" x2="80" y2="20" stroke="currentColor" strokeWidth="1" />
-                <line x1="20" y1="80" x2="30" y2="80" stroke="currentColor" strokeWidth="1" />
-                <line x1="70" y1="80" x2="80" y2="80" stroke="currentColor" strokeWidth="1" />
+                <line x1="20" y1="20" x2="30" y2="20" stroke="currentColor" strokeWidth="0.5" />
+                <line x1="70" y1="20" x2="80" y2="20" stroke="currentColor" strokeWidth="0.5" />
+                <line x1="20" y1="80" x2="30" y2="80" stroke="currentColor" strokeWidth="0.5" />
+                <line x1="70" y1="80" x2="80" y2="80" stroke="currentColor" strokeWidth="0.5" />
 
                 {/* Circuit nodes (small circles) */}
-                <circle cx="20" cy="20" r="2" fill="currentColor" />
-                <circle cx="80" cy="20" r="2" fill="currentColor" />
-                <circle cx="20" cy="80" r="2" fill="currentColor" />
-                <circle cx="80" cy="80" r="2" fill="currentColor" />
-                <circle cx="50" cy="50" r="1.5" fill="currentColor" />
+                <circle cx="20" cy="20" r="1.5" fill="currentColor" />
+                <circle cx="80" cy="20" r="1.5" fill="currentColor" />
+                <circle cx="20" cy="80" r="1.5" fill="currentColor" />
+                <circle cx="80" cy="80" r="1.5" fill="currentColor" />
+                <circle cx="50" cy="50" r="1" fill="currentColor" />
+
+                {/* Diagonal traces */}
+                <line x1="30" y1="20" x2="50" y2="50" stroke="currentColor" strokeWidth="0.3" />
+                <line x1="50" y1="50" x2="70" y2="80" stroke="currentColor" strokeWidth="0.3" />
               </pattern>
             </defs>
             <rect
               width="100%"
               height="100%"
               fill="url(#circuit)"
-              className="text-gray-900 dark:text-gray-100"
+              className="text-gray-900 dark:text-red-500"
             />
           </svg>
         </div>

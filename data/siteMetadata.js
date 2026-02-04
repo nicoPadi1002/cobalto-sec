@@ -8,7 +8,7 @@ const siteMetadata = {
     'Pentesting, auditorías de seguridad y consultoría ofensiva. Blog técnico con proyectos reales en producción, código open source y documentación detallada.',
   language: 'es-AR',
   locale: 'es-AR',
-  theme: 'system', // system, dark, light
+  theme: 'dark', // system, dark, light
 
   // Canonical + repos
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://cobalto-sec.tech',
@@ -32,7 +32,7 @@ const siteMetadata = {
   bluesky: '',
 
   // UI
-  stickyNav: false,
+  stickyNav: true,
 
   // Analytics
   analytics: {

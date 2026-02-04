@@ -66,7 +66,7 @@ export default function TechStack() {
           {technologies.map((tech) => (
             <div
               key={tech.name}
-              className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white px-4 py-2.5 shadow-sm transition-all hover:scale-105 hover:shadow-md dark:border-gray-800 dark:bg-gray-900"
+              className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white px-4 py-2.5 shadow-sm transition-all duration-300 hover:scale-105 hover:border-red-500/30 hover:shadow-md hover:shadow-red-500/5 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-red-500/30 dark:hover:shadow-red-500/10"
               title={tech.description}
             >
               <div className="flex items-center gap-2">
@@ -76,12 +76,12 @@ export default function TechStack() {
                 <span className="text-xs text-gray-500 dark:text-gray-400">{tech.category}</span>
               </div>
               {/* Hover effect */}
-              <div className="absolute inset-0 -z-10 bg-gradient-to-r from-sky-50 to-blue-50 opacity-0 transition-opacity group-hover:opacity-100 dark:from-sky-950 dark:to-blue-950" />
+              <div className="absolute inset-0 -z-10 bg-gradient-to-r from-red-50 to-orange-50 opacity-0 transition-opacity group-hover:opacity-100 dark:from-red-950/30 dark:to-orange-950/20" />
 
               {/* Tooltip on hover */}
-              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-lg bg-gray-900 px-3 py-2 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 sm:block dark:bg-gray-100 dark:text-gray-900">
+              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-lg bg-gray-900 px-3 py-2 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 sm:block dark:bg-gray-800 dark:text-gray-100">
                 {tech.description}
-                <div className="absolute top-full left-1/2 h-0 w-0 -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-100" />
+                <div className="absolute top-full left-1/2 h-0 w-0 -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-800" />
               </div>
             </div>
           ))}

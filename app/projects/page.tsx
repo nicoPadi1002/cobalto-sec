@@ -23,7 +23,7 @@ export default function ProjectsPage() {
         <div className="mt-6 flex flex-wrap gap-4">
           <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-white to-gray-50 px-4 py-2 dark:border-gray-800 dark:from-gray-900 dark:to-gray-800">
             <p className="text-xs text-gray-600 dark:text-gray-400">Proyectos Activos</p>
-            <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">
+            <p className="font-mono text-2xl font-bold text-cyan-600 dark:text-cyan-400">
               {activeProjects.length}
             </p>
           </div>
@@ -33,7 +33,9 @@ export default function ProjectsPage() {
           </div>
           <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-white to-gray-50 px-4 py-2 dark:border-gray-800 dark:from-gray-900 dark:to-gray-800">
             <p className="text-xs text-gray-600 dark:text-gray-400">Stack</p>
-            <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">Open Source</p>
+            <p className="font-mono text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+              Open Source
+            </p>
           </div>
         </div>
       </header>

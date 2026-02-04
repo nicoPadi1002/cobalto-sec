@@ -60,12 +60,12 @@ export default function ProjectCard({
   const metrics = getProjectMetrics()
 
   return (
-    <div className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-lg dark:border-gray-800 dark:bg-gray-900">
+    <div className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-red-500/30 dark:hover:shadow-red-500/10">
       <div className="p-8">
         {/* Header con título y status */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <h3 className="text-2xl font-bold tracking-tight group-hover:text-sky-600 dark:group-hover:text-sky-400">
+            <h3 className="text-2xl font-bold tracking-tight group-hover:text-red-500 dark:group-hover:text-red-400">
               <Link href={href}>{title}</Link>
             </h3>
           </div>
@@ -100,7 +100,9 @@ export default function ProjectCard({
           <div className="mt-6 grid grid-cols-3 gap-4 rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-4 dark:border-gray-800 dark:from-gray-800 dark:to-gray-900">
             {metrics.map((metric, idx) => (
               <div key={idx} className="text-center">
-                <p className="text-lg font-bold text-sky-600 dark:text-sky-400">{metric.value}</p>
+                <p className="font-mono text-lg font-bold text-cyan-600 dark:text-cyan-400">
+                  {metric.value}
+                </p>
                 <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">{metric.label}</p>
               </div>
             ))}
@@ -112,7 +114,7 @@ export default function ProjectCard({
           {tags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-sky-300 hover:bg-sky-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-sky-700 dark:hover:bg-sky-900/30"
+              className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-red-400/50 hover:bg-red-50 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-300 dark:hover:border-red-500/30 dark:hover:bg-red-950/30"
             >
               {tag}
             </span>
@@ -123,7 +125,7 @@ export default function ProjectCard({
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href={href}
-            className="inline-flex items-center rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sky-700 focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:outline-none dark:focus:ring-offset-gray-950"
+            className="inline-flex items-center rounded-lg bg-red-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/20 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none dark:focus:ring-offset-gray-950"
           >
             Ver Detalles Completos
           </Link>
@@ -132,7 +134,7 @@ export default function ProjectCard({
               href={github}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800 dark:focus:ring-offset-gray-950"
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800 dark:focus:ring-offset-gray-950"
             >
               <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                 <path
