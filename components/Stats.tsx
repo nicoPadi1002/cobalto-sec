@@ -6,9 +6,9 @@ export default function Stats() {
       subtext: 'En producción 24/7',
     },
     {
-      value: '2.7K+',
+      value: '81.7K+',
       label: 'Sesiones Honeypot',
-      subtext: 'Capturadas en 48h',
+      subtext: '640+ IPs únicas capturadas',
     },
     {
       value: '<15s',

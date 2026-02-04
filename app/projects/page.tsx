@@ -3,7 +3,7 @@ import ProjectCard from '@/components/ProjectCard'
 
 export const metadata = {
   title: 'Proyectos',
-  description: 'Proyectos de ciberseguridad, threat intelligence y automatización.',
+  description: 'Proyectos de seguridad ofensiva, pentesting y automatización de detección.',
 }
 
 export default function ProjectsPage() {
@@ -15,7 +15,7 @@ export default function ProjectsPage() {
       <header className="mb-12">
         <h1 className="text-4xl font-bold tracking-tight">Proyectos</h1>
         <p className="mt-3 text-lg text-gray-600 dark:text-gray-400">
-          Implementaciones de ciberseguridad, threat intelligence y automatización de SOC en
+          Implementaciones de seguridad ofensiva, detección de amenazas y automatización en
           producción
         </p>
 

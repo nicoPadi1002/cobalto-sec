@@ -65,7 +65,7 @@ contenido:
 proyectos:
   - nombre: "HoneyAI"
     estado: "active"
-    metricas: "2.7K+ sesiones capturadas"
+    metricas: "81.7K+ sesiones SSH capturadas"
   - nombre: "SIEM/SOAR Automation"
     estado: "active"
     metricas: "80K+ eventos procesados"
@@ -123,7 +123,7 @@ marca_personal:
         puerto: 5678
         url: "http://192.168.0.14:5678"
         estado: "running"
-        credenciales: "admin / cobalto_n8n_2026"
+        credenciales: "ver .env en LXC 104"
       - nombre: "PostgreSQL 16"
         container: "mp-postgres"
         puerto: 5432

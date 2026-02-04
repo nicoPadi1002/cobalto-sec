@@ -18,8 +18,8 @@ export default function Footer() {
               {siteMetadata.title}
             </h3>
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-              Blog técnico sobre ciberseguridad, threat intelligence y automatización de SOC.
-              Proyectos reales, código abierto, documentación detallada.
+              Pentesting, auditorías de seguridad y consultoría ofensiva. Proyectos reales en
+              producción, código abierto, documentación detallada.
             </p>
             <div className="flex gap-4">
               {siteMetadata.github && (
@@ -53,7 +53,7 @@ export default function Footer() {
                 </a>
               )}
               <a
-                href="mailto:dw.nicolaspadilla@gmail.com"
+                href="mailto:nicolas.cobaltosec@gmail.com"
                 className="text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
                 aria-label="Email"
               >
@@ -75,6 +75,12 @@ export default function Footer() {
               Navegación
             </h3>
             <nav className="flex flex-col gap-2">
+              <Link
+                href="/services"
+                className="text-sm text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
+              >
+                Servicios
+              </Link>
               <Link
                 href="/blog"
                 className="text-sm text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"

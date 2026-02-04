@@ -45,11 +45,11 @@ export default function FeaturedProjects() {
                   <div className="mt-4 grid grid-cols-2 gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Sesiones</p>
-                      <p className="text-lg font-bold text-sky-600 dark:text-sky-400">2.7K+</p>
+                      <p className="text-lg font-bold text-sky-600 dark:text-sky-400">81.7K+</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">IPs Únicas</p>
-                      <p className="text-lg font-bold text-sky-600 dark:text-sky-400">80+</p>
+                      <p className="text-lg font-bold text-sky-600 dark:text-sky-400">640+</p>
                     </div>
                   </div>
                 )}

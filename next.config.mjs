@@ -16,11 +16,11 @@ const UMAMI_HOST = (process.env.NEXT_PUBLIC_UMAMI_HOST || "analytics.umami.is")
   .replace(/^https?:\/\//, "")
   .replace(/\/.*$/, "")
 
-// Flags: abren permisos SOLO si existen las envs pÃºblicas
+// Flags: abren permisos SOLO si existen las envs públicas
 const USE_GISCUS = !!process.env.NEXT_PUBLIC_GISCUS_REPO
 const USE_UMAMI = !!process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
 
-// ðŸ‘‡ Ajuste clave: permitir 'unsafe-inline' siempre; 'unsafe-eval' solo en dev
+// Ajuste clave: permitir 'unsafe-inline' siempre; 'unsafe-eval' solo en dev
 const ContentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${USE_GISCUS ? " giscus.app" : ""}${

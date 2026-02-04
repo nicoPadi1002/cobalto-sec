@@ -42,8 +42,8 @@ export default function ProjectCard({
   const getProjectMetrics = () => {
     if (title === 'HoneyAI') {
       return [
-        { label: 'Sesiones capturadas', value: '2.7K+' },
-        { label: 'IPs únicas', value: '80+' },
+        { label: 'Sesiones capturadas', value: '81.7K+' },
+        { label: 'IPs únicas', value: '640+' },
         { label: 'Comandos analizados', value: '72+' },
       ]
     }

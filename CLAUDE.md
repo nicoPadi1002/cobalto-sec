@@ -81,10 +81,10 @@ npm run clean        # Limpiar .next, cache
 
 ## Proyectos Actuales
 
-| Proyecto             | Slug         | Estado | Métricas                      |
-| -------------------- | ------------ | ------ | ----------------------------- |
-| HoneyAI              | `honey-ai`   | Active | 2.7K+ sesiones SSH capturadas |
-| SIEM/SOAR Automation | `wazuh-soar` | Active | 80K+ eventos procesados       |
+| Proyecto             | Slug         | Estado | Métricas                            |
+| -------------------- | ------------ | ------ | ----------------------------------- |
+| HoneyAI              | `honey-ai`   | Active | 81.7K+ sesiones SSH, 640 IPs únicas |
+| SIEM/SOAR Automation | `wazuh-soar` | Active | 80K+ eventos procesados             |
 
 ## Arquitectura
 
@@ -112,7 +112,7 @@ MDX files (/data/blog/)
 
 - GitHub: https://github.com/nicoPadi1002
 - LinkedIn: https://www.linkedin.com/in/nicopadilla-sec/
-- Email: dw.nicolaspadilla@gmail.com
+- Email: nicolas.cobaltosec@gmail.com
 
 ---
 

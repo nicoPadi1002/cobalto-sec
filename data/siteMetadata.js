@@ -5,7 +5,7 @@ const siteMetadata = {
   author: 'Nicolás Padilla',
   headerTitle: 'Cobalto-Sec',
   description:
-    'Blog técnico sobre ciberseguridad, threat intelligence y automatización de SOC. Proyectos reales en producción con código open source y documentación detallada.',
+    'Pentesting, auditorías de seguridad y consultoría ofensiva. Blog técnico con proyectos reales en producción, código open source y documentación detallada.',
   language: 'es-AR',
   locale: 'es-AR',
   theme: 'system', // system, dark, light
@@ -20,7 +20,7 @@ const siteMetadata = {
 
   // Perfiles sociales
   mastodon: '',
-  email: 'dw.nicolaspadilla@gmail.com',
+  email: 'nicolas.cobaltosec@gmail.com',
   github: 'https://github.com/nicoPadi1002',
   x: '',
   facebook: '',

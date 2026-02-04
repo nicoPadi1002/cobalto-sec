@@ -8,11 +8,11 @@ export default function Hero() {
         <div className="space-y-4">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Nicolás Padilla</h1>
           <p className="text-xl font-medium text-sky-600 sm:text-2xl dark:text-sky-400">
-            Cybersecurity Consultant
+            Offensive Security Consultant
           </p>
           <p className="max-w-2xl text-lg leading-relaxed text-gray-700 dark:text-gray-300">
-            Ayudo a organizaciones a detectar, responder y prevenir amenazas mediante automatización
-            de SOC y análisis de seguridad ofensiva.
+            Pentesting, auditorías de seguridad y consultoría ofensiva. Ayudo a organizaciones a
+            identificar y explotar vulnerabilidades antes de que lo haga un atacante real.
           </p>
         </div>
 
@@ -21,13 +21,13 @@ export default function Hero() {
 
         <div className="mt-8 flex flex-wrap gap-2">
           <span className="inline-flex items-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-            SIEM
-          </span>
-          <span className="inline-flex items-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-            SOAR Automation
-          </span>
-          <span className="inline-flex items-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
             Penetration Testing
+          </span>
+          <span className="inline-flex items-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+            Security Audits
+          </span>
+          <span className="inline-flex items-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+            Vulnerability Assessment
           </span>
           <span className="inline-flex items-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
             Threat Intelligence
@@ -42,7 +42,7 @@ export default function Hero() {
             Ver Proyectos
           </Link>
           <Link
-            href="mailto:dw.nicolaspadilla@gmail.com"
+            href="mailto:nicolas.cobaltosec@gmail.com"
             className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-6 py-3 text-base font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800 dark:focus:ring-offset-gray-950"
           >
             Contacto
@@ -67,7 +67,7 @@ export default function Hero() {
             LinkedIn
           </a>
           <a
-            href="mailto:dw.nicolaspadilla@gmail.com"
+            href="mailto:nicolas.cobaltosec@gmail.com"
             className="text-sm font-medium text-gray-600 transition-colors hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400"
           >
             Email

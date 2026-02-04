@@ -1,5 +1,22 @@
 export default function TechStack() {
   const technologies = [
+    // Offensive Security
+    {
+      name: 'Metasploit',
+      category: 'Exploitation',
+      description: 'Framework de pentesting y explotación',
+    },
+    {
+      name: 'Burp Suite',
+      category: 'Web Security',
+      description: 'Proxy y scanner de seguridad web',
+    },
+    {
+      name: 'Nmap',
+      category: 'Recon',
+      description: 'Escaneo de redes y descubrimiento de servicios',
+    },
+
     // Security & Monitoring
     { name: 'Wazuh', category: 'SIEM', description: 'SIEM open source para detección de amenazas' },
     {
@@ -12,11 +29,6 @@ export default function TechStack() {
       category: 'Honeypot',
       description: 'Honeypot SSH/Telnet de media interacción',
     },
-    {
-      name: 'MISP',
-      category: 'Threat Intel',
-      description: 'Plataforma de threat intelligence compartida',
-    },
 
     // Infrastructure
     {
@@ -25,10 +37,9 @@ export default function TechStack() {
       description: 'Hipervisor enterprise open source',
     },
     { name: 'Docker', category: 'Containers', description: 'Containerización y microservicios' },
-    { name: 'LXC', category: 'Containers', description: 'Contenedores ligeros a nivel de SO' },
 
     // Automation & Dev
-    { name: 'Python', category: 'Development', description: 'Scripting y automatización' },
+    { name: 'Python', category: 'Development', description: 'Scripting y automatización ofensiva' },
     { name: 'Bash', category: 'Scripting', description: 'Automatización de sistemas Linux' },
     { name: 'n8n', category: 'Automation', description: 'Workflow automation self-hosted' },
 
@@ -38,7 +49,6 @@ export default function TechStack() {
       category: 'Visualization',
       description: 'Dashboards y visualización de datos',
     },
-    { name: 'Loki', category: 'Logging', description: 'Sistema de logs optimizado' },
     { name: 'Ollama', category: 'AI/ML', description: 'Modelos LLM locales para análisis' },
   ]
 

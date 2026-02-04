@@ -1,7 +1,17 @@
 import Link from 'next/link'
 
 export default function AboutPreview() {
-  const stack = ['Wazuh', 'Proxmox', 'n8n', 'Docker', 'LXC', 'Grafana', 'Loki', 'Python', 'Bash']
+  const stack = [
+    'Metasploit',
+    'Burp Suite',
+    'Nmap',
+    'Python',
+    'Wazuh',
+    'Proxmox',
+    'Docker',
+    'n8n',
+    'Bash',
+  ]
 
   return (
     <section className="border-b py-12">
@@ -9,9 +19,9 @@ export default function AboutPreview() {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold tracking-tight">Sobre mí</h2>
           <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300">
-            Consultor de ciberseguridad especializado en implementación de SIEM, automatización de
-            SOC y análisis de seguridad ofensiva. Trabajo con infraestructura on-premise y cloud,
-            enfocado en threat intelligence y respuesta a incidentes.
+            Consultor de seguridad ofensiva especializado en pentesting, auditorías de seguridad y
+            vulnerability assessment. Trabajo con infraestructura on-premise y cloud, enfocado en
+            identificar y explotar vulnerabilidades antes de que lo haga un atacante.
           </p>
 
           <div>
