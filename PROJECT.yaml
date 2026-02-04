@@ -1,6 +1,6 @@
 # =====================================================
 # PROJECT.yaml - Cobalto-Sec Web
-# Última actualización: 2026-01-31
+# Última actualización: 2026-02-03
 # =====================================================
 
 # INFORMACIÓN GENERAL
@@ -12,9 +12,9 @@ prioridad: "alta"
 valor: "Presencia profesional online, showcase de proyectos de ciberseguridad"
 
 # PROGRESO
-bloque_actual: PENDIENTE  # No se ha usado sistema de bloques anteriormente
-ultimo_sync: "2026-01-31T10:00:00"
-porcentaje_completado: 85  # Sitio funcional, features principales implementadas
+bloque_actual: "B2 completado - Análisis Web"
+ultimo_sync: "2026-02-03T12:00:00"
+porcentaje_completado: 85  # Funcional pero con 4 bugs críticos identificados
 
 # INFRAESTRUCTURA
 infra:
