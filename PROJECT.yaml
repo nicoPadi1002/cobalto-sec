@@ -1,0 +1,182 @@
+# =====================================================
+# PROJECT.yaml - Cobalto-Sec Web
+# Última actualización: 2026-01-31
+# =====================================================
+
+# INFORMACIÓN GENERAL
+nombre: "Cobalto-Sec Web"
+descripcion: "Sitio web profesional y blog técnico de ciberseguridad. Portfolio de proyectos con métricas reales de sistemas en producción."
+cliente: "Personal / Portfolio Profesional"
+estado: "produccion"
+prioridad: "alta"
+valor: "Presencia profesional online, showcase de proyectos de ciberseguridad"
+
+# PROGRESO
+bloque_actual: PENDIENTE  # No se ha usado sistema de bloques anteriormente
+ultimo_sync: "2026-01-31T10:00:00"
+porcentaje_completado: 85  # Sitio funcional, features principales implementadas
+
+# INFRAESTRUCTURA
+infra:
+  nodo: "Vercel (Cloud)"
+  ram_asignada: "N/A - Serverless"
+  servicios:
+    - nombre: "Next.js App"
+      puerto: 443
+      url: "https://cobalto-sec.tech"
+    - nombre: "Dev Server"
+      puerto: 3000
+      url: "http://localhost:3000"
+  paths:
+    proyecto: "C:\\Users\\nicol\\Desktop\\WEB\\cobalto-sec-clean"
+    db: "N/A - Static Site (Contentlayer MDX)"
+    logs: "Vercel Dashboard / npm run dev console"
+
+# REPOSITORIO
+repositorio:
+  url: "https://github.com/nicoPadi1002/cobalto-sec"
+  branch_principal: "main"
+  deploy_automatico: true
+  plataforma: "Vercel"
+
+# STACK TÉCNICO
+stack:
+  framework: "Next.js 14+ (App Router)"
+  lenguaje: "TypeScript"
+  estilos: "Tailwind CSS"
+  contenido: "Contentlayer + MDX"
+  template_base: "Tailwind Next.js Starter Blog"
+
+# CONTENIDO ACTUAL
+contenido:
+  posts_publicados: 7
+  proyectos_destacados: 2
+  tags_usados:
+    - wazuh
+    - siem
+    - soc
+    - automation
+    - honeypot
+    - ai
+    - python
+    - threat-intelligence
+
+# PROYECTOS SHOWCASE
+proyectos:
+  - nombre: "HoneyAI"
+    estado: "active"
+    metricas: "2.7K+ sesiones capturadas"
+  - nombre: "SIEM/SOAR Automation"
+    estado: "active"
+    metricas: "80K+ eventos procesados"
+
+# FEATURES IMPLEMENTADAS
+features_completadas:
+  - Sistema de blog MDX con syntax highlighting
+  - Sistema de tags con páginas dinámicas
+  - Múltiples layouts de post (PostLayout, PostSimple, PostBanner)
+  - Dark mode
+  - RSS feed automático
+  - Sitemap automático
+  - SEO optimizado
+  - Página de proyectos con cards
+  - Search con Kbar
+  - Mobile responsive
+
+# FEATURES PENDIENTES
+features_pendientes:
+  - Filtro de posts por proyecto (alta prioridad)
+  - Newsletter/Contact form
+  - Comentarios (Giscus - baja prioridad)
+  - Related posts automáticos
+
+# MÉTRICAS
+metricas:
+  lighthouse_score: "95+"
+  bundle_size: "<100kb first load"
+  tiempo_deploy: "~2-3 minutos"
+
+# =====================================================
+# MÓDULO MARCA PERSONAL
+# Última actualización: 2026-02-03
+# =====================================================
+
+marca_personal:
+  estado: "fase_1_parcial"
+  objetivo: "Sistema de métricas, automaciones y contenido para marca personal"
+
+  # INFRAESTRUCTURA DESPLEGADA
+  backend:
+    nodo: "LXC 104 (Proxmox - Notebook-HP)"
+    vmid: 104
+    hostname: "marcapersonal"
+    os: "Ubuntu 24.04 LTS"
+    ip_lan: "192.168.0.14"
+    ram: "2GB"
+    disco: "20GB"
+    cores: 2
+    features: "nesting=1"
+    proxmox_host: "192.168.0.118"
+    servicios_activos:
+      - nombre: "n8n"
+        container: "mp-n8n"
+        puerto: 5678
+        url: "http://192.168.0.14:5678"
+        estado: "running"
+        credenciales: "admin / cobalto_n8n_2026"
+      - nombre: "PostgreSQL 16"
+        container: "mp-postgres"
+        puerto: 5432
+        estado: "healthy"
+        db: "marcapersonal"
+        user: "marcapersonal"
+    servicios_pendientes:
+      - nombre: "API Métricas"
+        puerto: 3001
+        funcion: "REST API que agrega datos de fuentes externas"
+      - nombre: "Tailscale"
+        funcion: "Acceso remoto seguro"
+    paths:
+      proyecto: "/opt/marcapersonal"
+      compose: "/opt/marcapersonal/docker-compose.yml"
+      env: "/opt/marcapersonal/.env"
+      data: "/opt/marcapersonal/data/"
+
+  # FRONTEND (POR IMPLEMENTAR)
+  frontend:
+    ubicacion: "Este repo (app/dashboard, app/api/metrics, components/)"
+    componentes_nuevos:
+      - "/app/dashboard/ - Página de métricas agregadas"
+      - "/app/api/metrics/ - Proxy al backend LXC 104"
+      - "/components/MetricsCard.tsx - Card de KPIs"
+      - "Sección actividad reciente en homepage"
+
+  integraciones:
+    prioridad_alta:
+      - "GitHub API (repos, stars, commits)"
+      - "Umami (visitas, referrers)"
+      - "Google Analytics GA4 (pageviews, sesiones)"
+      - "n8n (orquestación) ✅ desplegado"
+      - "RSS propio (conteo posts)"
+    prioridad_media:
+      - "LinkedIn API (restringida, evaluar opciones)"
+    prioridad_baja:
+      - "Credly/Acclaim (certificaciones)"
+      - "Wakatime (horas de código)"
+
+  fases:
+    fase_1: "Setup LXC 104 + n8n + PostgreSQL ✅ COMPLETADO"
+    fase_1b: "Crear API de métricas + workflow n8n GitHub/RSS"
+    fase_2: "Integrar GA4/Umami + dashboard en web"
+    fase_3: "Automaciones (auto-publicar, digest semanal)"
+    fase_4: "Explorar integración LinkedIn"
+
+  decisiones_tomadas:
+    - "Base de datos: PostgreSQL 16 (Alpine)"
+    - "Orquestación: n8n con persistencia en PostgreSQL"
+
+  decisiones_pendientes:
+    - "Lenguaje backend API: Node.js vs Python FastAPI"
+    - "Dashboard público vs privado"
+    - "Dominio API: api.cobalto-sec.tech vs ruta interna"
+    - "Tailscale en LXC 104 para acceso remoto"
