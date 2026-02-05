@@ -6,7 +6,7 @@ export default function FeaturedProjects() {
   const featuredProjects = projectsData.filter((p) => p.status === 'active').slice(0, 2)
 
   return (
-    <section className="border-b border-gray-200 py-16 dark:border-gray-800">
+    <section className="border-b border-gray-200 py-20 dark:border-gray-800">
       <div className="mx-auto max-w-5xl px-4">
         <div className="mb-8">
           <h2 className="text-3xl font-bold tracking-tight">Proyectos Destacados</h2>

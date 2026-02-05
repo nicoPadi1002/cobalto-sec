@@ -53,7 +53,7 @@ export default function TechStack() {
   ]
 
   return (
-    <section className="border-b py-16">
+    <section className="border-b py-20">
       <div className="mx-auto max-w-4xl px-4">
         <div className="mb-10 text-center">
           <h2 className="text-3xl font-bold tracking-tight">Stack Tecnológico</h2>

@@ -12,7 +12,12 @@
       "Bash(git push:*)",
       "WebFetch(domain:bishopfox.com)",
       "WebFetch(domain:xbow.com)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "WebFetch(domain:www.cobalt.io)",
+      "WebFetch(domain:www.deltaprotect.com)",
+      "WebFetch(domain:www.pethuraj.com)",
+      "WebFetch(domain:danielmiessler.com)",
+      "WebFetch(domain:www.fidusinfoecurity.com)"
     ]
   }
 }

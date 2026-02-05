@@ -14,7 +14,7 @@ export default function AboutPreview() {
   ]
 
   return (
-    <section className="border-b py-12">
+    <section className="border-b py-20">
       <div className="mx-auto max-w-3xl px-4">
         <div className="space-y-4">
           <h2 className="text-2xl font-bold tracking-tight">Sobre mí</h2>
