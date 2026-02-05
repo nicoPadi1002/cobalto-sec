@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ssh:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nDocs: Setup MarcaPersonal infra + CLAUDE.md\n\n- Created CLAUDE.md with full project context and MarcaPersonal architecture\n- Created LXC 104 \\(marcapersonal\\) on Proxmox: Ubuntu 24.04, Docker, n8n + PostgreSQL\n- Updated PROJECT.yaml with deployed infrastructure details\n- Updated CHANGELOG.md with B1 block entry\n- Updated SIGUIENTE.md with B2 proposal \\(n8n workflows, GitHub metrics\\)\n- Added ARQUITECTURA.md and INSTRUCCIONES.md to version control\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(npm run build:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "WebFetch(domain:cobalto-sec.tech)",
+      "Bash(npx next build:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:bishopfox.com)",
+      "WebFetch(domain:xbow.com)",
+      "Bash(ls:*)"
+    ]
+  }
+}

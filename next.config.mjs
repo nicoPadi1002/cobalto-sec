@@ -29,12 +29,12 @@ const ContentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "media-src https://*.s3.amazonaws.com",
-  `connect-src 'self' ${isDev ? "ws:" : ""} https:`,
+  `connect-src 'self' ${isDev ? "ws:" : ""} https://formspree.io https:`,
   "font-src 'self' data:",
   USE_GISCUS ? "frame-src giscus.app" : "frame-src 'none'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  "form-action 'self' https://formspree.io",
   !isDev ? "upgrade-insecure-requests" : "",
 ]
   .filter(Boolean)

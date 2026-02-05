@@ -67,6 +67,17 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
 }
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Cobalto-Sec',
+  url: 'https://cobalto-sec.tech',
+  logo: 'https://cobalto-sec.tech/static/images/og-default.png',
+  founder: { '@type': 'Person', name: 'Nicolás Padilla' },
+  contactPoint: { '@type': 'ContactPoint', email: 'nicolas@cobalto-sec.tech' },
+  sameAs: ['https://github.com/nicoPadi1002', 'https://linkedin.com/in/nicopadilla-sec/'],
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -74,6 +85,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${space_grotesk.variable} ${jetbrains_mono.variable} scroll-smooth`}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+      </head>
       <body className="relative bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
         {/* Circuit pattern background */}
         <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] dark:opacity-[0.06]">

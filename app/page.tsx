@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import siteMetadata from '@/data/siteMetadata'
 import { allBlogs } from 'contentlayer/generated'
 import Hero from '@/components/Hero'
+import StatsStrip from '@/components/StatsStrip'
 import FeaturedProjects from '@/components/FeaturedProjects'
 import TechStack from '@/components/TechStack'
 import AboutPreview from '@/components/AboutPreview'
@@ -25,14 +26,18 @@ export default function HomePage() {
       <Hero />
 
       <FadeIn>
-        <FeaturedProjects />
+        <StatsStrip />
       </FadeIn>
 
       <FadeIn delay={100}>
-        <TechStack />
+        <FeaturedProjects />
       </FadeIn>
 
       <FadeIn delay={200}>
+        <TechStack />
+      </FadeIn>
+
+      <FadeIn delay={300}>
         <AboutPreview />
       </FadeIn>
 
@@ -56,7 +61,7 @@ export default function HomePage() {
             </p>
           </section>
         ) : (
-          <FadeIn delay={300}>
+          <FadeIn delay={400}>
             <header className="mb-8">
               <h2 className="text-3xl font-bold tracking-tight">Últimos Artículos</h2>
               <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -66,7 +71,7 @@ export default function HomePage() {
 
             <section aria-label="Últimas publicaciones" className="grid gap-6 md:grid-cols-2">
               {posts.map((post, idx) => (
-                <FadeIn key={post._id} delay={350 + idx * 50}>
+                <FadeIn key={post._id} delay={450 + idx * 50}>
                   <BlogCard post={post} />
                 </FadeIn>
               ))}

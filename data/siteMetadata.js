@@ -20,7 +20,7 @@ const siteMetadata = {
 
   // Perfiles sociales
   mastodon: '',
-  email: 'nicolas.cobaltosec@gmail.com',
+  email: 'nicolas@cobalto-sec.tech',
   github: 'https://github.com/nicoPadi1002',
   x: '',
   facebook: '',

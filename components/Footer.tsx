@@ -53,7 +53,7 @@ export default function Footer() {
                 </a>
               )}
               <a
-                href="mailto:nicolas.cobaltosec@gmail.com"
+                href="mailto:nicolas@cobalto-sec.tech"
                 className="text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
                 aria-label="Email"
               >

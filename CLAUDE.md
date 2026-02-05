@@ -112,7 +112,7 @@ MDX files (/data/blog/)
 
 - GitHub: https://github.com/nicoPadi1002
 - LinkedIn: https://www.linkedin.com/in/nicopadilla-sec/
-- Email: nicolas.cobaltosec@gmail.com
+- Email: nicolas@cobalto-sec.tech
 
 ---
 

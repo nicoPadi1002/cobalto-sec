@@ -1,6 +1,6 @@
 # =====================================================
 # PROJECT.yaml - Cobalto-Sec Web
-# Última actualización: 2026-02-03
+# Última actualización: 2026-02-05 (B5 Rediseño visual Bishop Fox)
 # =====================================================
 
 # INFORMACIÓN GENERAL
@@ -12,9 +12,27 @@ prioridad: "alta"
 valor: "Presencia profesional online, showcase de proyectos de ciberseguridad"
 
 # PROGRESO
-bloque_actual: "B2 completado - Análisis Web"
-ultimo_sync: "2026-02-03T12:00:00"
-porcentaje_completado: 85  # Funcional pero con 4 bugs críticos identificados
+bloque_actual: "B5 completado - Rediseño visual"
+ultimo_sync: "2026-02-05T01:30:00"
+porcentaje_completado: 95
+
+# CAMBIOS B4-B5 (2026-02-04)
+cambios_b4_b5:
+  b4_reorientacion:
+    - "Metricas actualizadas: 81.7K sessions, 640 IPs"
+    - "Contenido reorientado a seguridad ofensiva"
+    - "Services page creada con 4 servicios"
+    - "Email: nicolas@cobalto-sec.tech"
+  b5_redesign:
+    - "Paleta dual-accent: rojo (#ef4444) + cyan (#06b6d4)"
+    - "Dark-first theme"
+    - "Hero full-width con gradient + glow blurs"
+    - "JetBrains Mono para metricas"
+    - "Card hover glow effect"
+    - "Nav sticky + backdrop blur"
+    - "Circuit animation SVG"
+    - "Link underline transitions"
+  inspiracion: "Bishop Fox + XBOW"
 
 # INFRAESTRUCTURA
 infra:
