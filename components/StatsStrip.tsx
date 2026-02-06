@@ -10,8 +10,6 @@ interface HoneypotStats {
   countries: number
 }
 
-const DATA_URL = process.env.NEXT_PUBLIC_HONEYPOT_DATA_URL
-
 function formatNumber(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K+`
   return n.toLocaleString()
@@ -38,20 +36,13 @@ export default function StatsStrip() {
 
   useEffect(() => {
     async function load() {
-      if (!DATA_URL) {
-        console.warn('[StatsStrip] NEXT_PUBLIC_HONEYPOT_DATA_URL not set, using mock data')
-        return
-      }
       try {
         const res = await fetch('/api/honeypot-data', { cache: 'no-store' })
-        if (!res.ok) {
-          console.warn(`[StatsStrip] Fetch failed with status ${res.status}`)
-          return
-        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const json = await res.json()
         setStats(buildStats(json.stats))
-      } catch (err) {
-        console.warn('[StatsStrip] Fetch error:', err)
+      } catch {
+        // proxy unavailable or rewrite not configured — keep mock fallback
       }
     }
     load()

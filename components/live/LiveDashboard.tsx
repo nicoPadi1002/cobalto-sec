@@ -40,7 +40,6 @@ interface HoneypotData {
   }>
 }
 
-const DATA_URL = process.env.NEXT_PUBLIC_HONEYPOT_DATA_URL
 const REFRESH_INTERVAL = 60_000
 
 function formatNumber(n: number): string {
@@ -60,14 +59,6 @@ export default function LiveDashboard() {
   const [error, setError] = useState<string | null>(null)
 
   const fetchData = useCallback(async () => {
-    if (!DATA_URL) {
-      // Use mock data with a fresh timestamp so LiveIndicator shows "Live"
-      const mock = { ...mockData, generatedAt: new Date().toISOString() }
-      setData(mock)
-      setLoading(false)
-      return
-    }
-
     try {
       const res = await fetch('/api/honeypot-data', { cache: 'no-store' })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -75,6 +66,8 @@ export default function LiveDashboard() {
       setData(json)
       setError(null)
     } catch (err) {
+      // Proxy unavailable on first load — show mock so UI isn't empty
+      setData((prev) => prev ?? { ...mockData, generatedAt: new Date().toISOString() })
       setError(err instanceof Error ? err.message : 'Error al cargar datos')
     } finally {
       setLoading(false)
