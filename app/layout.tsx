@@ -5,7 +5,7 @@ import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
 import { Space_Grotesk, JetBrains_Mono } from 'next/font/google'
-import { Analytics, type AnalyticsConfig } from 'pliny/analytics'
+// Umami analytics injected directly via next/script in <head>
 import { SearchProvider, type SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
 import SectionContainer from '@/components/SectionContainer'
@@ -90,6 +90,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
+        {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
+          <Script
+            defer
+            src={`https://${(process.env.NEXT_PUBLIC_UMAMI_HOST || 'analytics.umami.is').replace(/^https?:\/\//, '')}/script.js`}
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+            strategy="afterInteractive"
+          />
+        )}
       </head>
       <body className="relative bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
         {/* Circuit pattern background */}
@@ -140,7 +148,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         <ThemeProviders>
-          <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
           <div className="relative z-10">
             <SectionContainer>
               <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
