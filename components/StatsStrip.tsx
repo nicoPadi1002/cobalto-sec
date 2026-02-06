@@ -12,12 +12,6 @@ interface HoneypotStats {
 
 const DATA_URL = process.env.NEXT_PUBLIC_HONEYPOT_DATA_URL
 
-const FALLBACK = [
-  { value: '81.7K+', label: 'Sesiones SSH', description: 'Ataques capturados en producción' },
-  { value: '640+', label: 'IPs Únicas', description: 'Atacantes únicos identificados' },
-  { value: '45', label: 'Países', description: 'Origen geográfico de ataques' },
-]
-
 function formatNumber(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K+`
   return n.toLocaleString()
@@ -40,21 +34,24 @@ function buildStats(s: HoneypotStats) {
 }
 
 export default function StatsStrip() {
-  const [stats, setStats] = useState(FALLBACK)
+  const [stats, setStats] = useState(() => buildStats(mockData.stats))
 
   useEffect(() => {
     async function load() {
       if (!DATA_URL) {
-        setStats(buildStats(mockData.stats))
+        console.warn('[StatsStrip] NEXT_PUBLIC_HONEYPOT_DATA_URL not set, using mock data')
         return
       }
       try {
         const res = await fetch(DATA_URL, { cache: 'no-store' })
-        if (!res.ok) return
+        if (!res.ok) {
+          console.warn(`[StatsStrip] Fetch failed with status ${res.status}`)
+          return
+        }
         const json = await res.json()
         setStats(buildStats(json.stats))
-      } catch {
-        // keep fallback
+      } catch (err) {
+        console.warn('[StatsStrip] Fetch error:', err)
       }
     }
     load()
