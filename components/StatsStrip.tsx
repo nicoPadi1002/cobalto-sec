@@ -1,10 +1,64 @@
-export default function StatsStrip() {
-  const stats = [
-    { value: '81.7K+', label: 'Sesiones SSH', description: 'Ataques capturados en producción' },
-    { value: '640+', label: 'IPs Analizadas', description: 'Atacantes únicos identificados' },
-    { value: '<15s', label: 'Tiempo de Respuesta', description: 'Detección a bloqueo automático' },
-    { value: '24/7', label: 'En Producción', description: 'Infraestructura propia activa' },
+'use client'
+
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import mockData from '@/data/mock/honeypot-live.json'
+
+interface HoneypotStats {
+  totalSessions: number
+  uniqueIPs: number
+  countries: number
+}
+
+const DATA_URL = process.env.NEXT_PUBLIC_HONEYPOT_DATA_URL
+
+const FALLBACK = [
+  { value: '81.7K+', label: 'Sesiones SSH', description: 'Ataques capturados en producción' },
+  { value: '640+', label: 'IPs Únicas', description: 'Atacantes únicos identificados' },
+  { value: '45', label: 'Países', description: 'Origen geográfico de ataques' },
+]
+
+function formatNumber(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K+`
+  return n.toLocaleString()
+}
+
+function buildStats(s: HoneypotStats) {
+  return [
+    {
+      value: formatNumber(s.totalSessions),
+      label: 'Sesiones SSH',
+      description: 'Ataques capturados en producción',
+    },
+    {
+      value: formatNumber(s.uniqueIPs),
+      label: 'IPs Únicas',
+      description: 'Atacantes únicos identificados',
+    },
+    { value: String(s.countries), label: 'Países', description: 'Origen geográfico de ataques' },
   ]
+}
+
+export default function StatsStrip() {
+  const [stats, setStats] = useState(FALLBACK)
+
+  useEffect(() => {
+    async function load() {
+      if (!DATA_URL) {
+        setStats(buildStats(mockData.stats))
+        return
+      }
+      try {
+        const res = await fetch(DATA_URL, { cache: 'no-store' })
+        if (!res.ok) return
+        const json = await res.json()
+        setStats(buildStats(json.stats))
+      } catch {
+        // keep fallback
+      }
+    }
+    load()
+  }, [])
 
   return (
     <section className="relative -mx-4 overflow-hidden px-4 py-16 sm:-mx-6 sm:px-6 sm:py-20">
@@ -18,7 +72,7 @@ export default function StatsStrip() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+        <div className="grid grid-cols-3 gap-4 sm:gap-6">
           {stats.map((stat, index) => (
             <div
               key={index}
@@ -35,23 +89,39 @@ export default function StatsStrip() {
           ))}
         </div>
 
-        {/* Trust badges */}
-        <div className="mt-10 flex flex-wrap justify-center gap-3">
-          {['Infraestructura Propia', 'Open Source', 'Datos Reales'].map((badge) => (
-            <span
-              key={badge}
-              className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-400"
-            >
-              <svg className="h-3.5 w-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {badge}
+        {/* CTA + Trust badges */}
+        <div className="mt-10 flex flex-col items-center gap-6">
+          <Link
+            href="/live"
+            className="inline-flex items-center gap-2 rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-5 py-2.5 text-sm font-semibold text-cyan-600 transition-all hover:border-cyan-500 hover:bg-cyan-500/20 hover:shadow-lg hover:shadow-cyan-500/10 dark:text-cyan-400 dark:hover:border-cyan-400 dark:hover:shadow-cyan-400/10"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
             </span>
-          ))}
+            Monitor en Tiempo Real
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+
+          <div className="flex flex-wrap justify-center gap-3">
+            {['Infraestructura Propia', 'Open Source', 'Datos Reales'].map((badge) => (
+              <span
+                key={badge}
+                className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-400"
+              >
+                <svg className="h-3.5 w-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {badge}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </section>

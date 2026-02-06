@@ -1,5 +1,6 @@
 // data/headerNavLinks.ts
 const headerNavLinks = [
+  { href: '/live', title: 'Live' },
   { href: '/services', title: 'Servicios' },
   { href: '/blog', title: 'Blog' },
   { href: '/projects', title: 'Proyectos' },

