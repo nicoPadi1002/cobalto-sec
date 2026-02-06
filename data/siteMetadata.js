@@ -34,10 +34,13 @@ const siteMetadata = {
   // UI
   stickyNav: true,
 
-  // Analytics
+  // Analytics — Umami self-hosted
   analytics: {
     umamiAnalytics: {
-      umamiWebsiteId: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID || process.env.NEXT_UMAMI_ID || '',
+      umamiWebsiteId: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID || '',
+      ...(process.env.NEXT_PUBLIC_UMAMI_HOST && {
+        src: `https://${process.env.NEXT_PUBLIC_UMAMI_HOST.replace(/^https?:\/\//, '')}/script.js`,
+      }),
     },
   },
 
