@@ -23,7 +23,7 @@ const USE_UMAMI = !!process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
 // Ajuste clave: permitir 'unsafe-inline' siempre; 'unsafe-eval' solo en dev
 const ContentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${USE_GISCUS ? " giscus.app" : ""} ${UMAMI_HOST} static.cloudflareinsights.com`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${USE_GISCUS ? " giscus.app" : ""} analytics.cobalto-sec.tech static.cloudflareinsights.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "media-src https://*.s3.amazonaws.com",
