@@ -90,14 +90,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
-        {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
-          <Script
-            defer
-            src={`https://${(process.env.NEXT_PUBLIC_UMAMI_HOST || 'analytics.umami.is').replace(/^https?:\/\//, '')}/script.js`}
-            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
-            strategy="afterInteractive"
-          />
-        )}
+        <Script
+          defer
+          src="https://analytics.cobalto-sec.tech/script.js"
+          data-website-id="10dd27da-b625-49ce-900a-8033a98167ed"
+          strategy="afterInteractive"
+        />
       </head>
       <body className="relative bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
         {/* Circuit pattern background */}
