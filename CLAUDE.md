@@ -81,10 +81,10 @@ npm run clean        # Limpiar .next, cache
 
 ## Proyectos Actuales
 
-| Proyecto             | Slug         | Estado | Métricas                            |
-| -------------------- | ------------ | ------ | ----------------------------------- |
-| HoneyAI              | `honey-ai`   | Active | 81.7K+ sesiones SSH, 640 IPs únicas |
-| SIEM/SOAR Automation | `wazuh-soar` | Active | 80K+ eventos procesados             |
+| Proyecto             | Slug         | Estado | Métricas                          |
+| -------------------- | ------------ | ------ | --------------------------------- |
+| HoneyAI              | `honey-ai`   | Active | 79K+ sesiones SSH, 573 IPs únicas |
+| SIEM/SOAR Automation | `wazuh-soar` | Active | 80K+ eventos procesados           |
 
 ## Arquitectura
 
@@ -99,6 +99,20 @@ MDX files (/data/blog/)
 - Git es la base de datos (no hay DB)
 - Todo se pre-renderiza en build
 - Cambios requieren rebuild
+
+## Live Dashboard (/live)
+
+Dashboard en tiempo real del honeypot HoneyAI.
+
+- **Data URL**: `https://pub-60494eebccb34036a63a5d8dbbb9f43d.r2.dev/honeypot-live.json`
+- **Env var**: `NEXT_PUBLIC_HONEYPOT_DATA_URL` (set in Vercel + .env.local)
+- **Pipeline**: LXC 104 script → Loki (LXC 102) → sanitize → Cloudflare R2
+- **Script**: `/opt/marcapersonal/scripts/honeypot-to-r2.py` en LXC 104
+- **Cron**: `*/5 * * * *` — cada 5 minutos
+- **Log**: `/var/log/honeypot-to-r2.log` en LXC 104
+- **GeoIP cache**: `/opt/marcapersonal/scripts/.geoip_cache.json`
+- **R2 bucket**: `honeyai-live` (Cloudflare)
+- **Fallback**: Si `NEXT_PUBLIC_HONEYPOT_DATA_URL` no está definida, usa mock data
 
 ## Features Pendientes (prioridad)
 
