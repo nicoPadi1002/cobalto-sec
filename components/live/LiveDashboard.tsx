@@ -69,7 +69,7 @@ export default function LiveDashboard() {
     }
 
     try {
-      const res = await fetch(DATA_URL, { cache: 'no-store' })
+      const res = await fetch('/api/honeypot-data', { cache: 'no-store' })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const json: HoneypotData = await res.json()
       setData(json)

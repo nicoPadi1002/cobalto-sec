@@ -71,6 +71,12 @@ const config = () => {
     async headers() {
       return [{ source: "/(.*)", headers: securityHeaders }]
     },
+    async rewrites() {
+      const honeypotUrl = process.env.NEXT_PUBLIC_HONEYPOT_DATA_URL
+      return honeypotUrl
+        ? [{ source: "/api/honeypot-data", destination: honeypotUrl }]
+        : []
+    },
     webpack: (config) => {
       config.module.rules.push({ test: /\.svg$/, use: ["@svgr/webpack"] })
       return config

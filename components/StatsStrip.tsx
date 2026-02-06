@@ -43,7 +43,7 @@ export default function StatsStrip() {
         return
       }
       try {
-        const res = await fetch(DATA_URL, { cache: 'no-store' })
+        const res = await fetch('/api/honeypot-data', { cache: 'no-store' })
         if (!res.ok) {
           console.warn(`[StatsStrip] Fetch failed with status ${res.status}`)
           return
