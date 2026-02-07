@@ -6,16 +6,16 @@ Portfolio profesional y blog técnico de ciberseguridad de **Nicolás Padilla**.
 
 ## Stack
 
-| Componente      | Tecnología                    | Notas                        |
-| --------------- | ----------------------------- | ---------------------------- |
-| Framework       | Next.js 14 (App Router)       | SSG, React Server Components |
-| Lenguaje        | TypeScript                    | Strict mode                  |
-| Estilos         | Tailwind CSS v4               | PostCSS plugin, tema OKLCH   |
-| Contenido       | Contentlayer2 + MDX           | Build-time processing        |
-| Hosting         | Vercel                        | Auto-deploy desde `main`     |
-| Búsqueda        | Kbar                          | Command palette              |
-| Analytics       | Umami (configurado, opcional) |                              |
-| Package Manager | Yarn 3.6.1                    |                              |
+| Componente      | Tecnología                  | Notas                        |
+| --------------- | --------------------------- | ---------------------------- |
+| Framework       | Next.js 14 (App Router)     | SSG, React Server Components |
+| Lenguaje        | TypeScript                  | Strict mode                  |
+| Estilos         | Tailwind CSS v4             | PostCSS plugin, tema OKLCH   |
+| Contenido       | Contentlayer2 + MDX         | Build-time processing        |
+| Hosting         | Vercel                      | Auto-deploy desde `main`     |
+| Búsqueda        | Kbar                        | Command palette              |
+| Analytics       | Umami (self-hosted, activo) | analytics.cobalto-sec.tech   |
+| Package Manager | Yarn 3.6.1                  |                              |
 
 ## Estructura de Archivos
 
@@ -25,8 +25,10 @@ app/                    # Next.js App Router (páginas)
   projects/             # /projects, /projects/[slug]
   tags/                 # /tags, /tags/[tag]
   about/                # /about
-  api/                  # API routes (newsletter)
-components/             # ~26 componentes React
+  dashboard/            # /dashboard (privado, password-protected)
+  api/                  # API routes (newsletter, dashboard, honeypot-data)
+components/             # ~34 componentes React
+  dashboard/            # 8 componentes del dashboard privado
 layouts/                # 6 templates de posts (PostLayout, PostSimple, PostBanner, etc.)
 data/
   blog/*.mdx            # Posts (7 publicados)
@@ -114,13 +116,38 @@ Dashboard en tiempo real del honeypot HoneyAI.
 - **R2 bucket**: `honeyai-live` (Cloudflare)
 - **Fallback**: Si `NEXT_PUBLIC_HONEYPOT_DATA_URL` no está definida, usa mock data
 
+## Private Dashboard (/dashboard)
+
+Dashboard de métricas privado, protegido por password.
+
+- **Auth**: Cookie `dashboard_auth` (SHA256 hash de `DASHBOARD_PASSWORD` env var)
+- **Secciones**: Web Traffic (Umami), Infrastructure (Cloudflare), Email Outreach (R2), SEO (GSC), LinkedIn (placeholder)
+- **API routes**: `/api/dashboard/{auth,umami,cloudflare,email,gsc}` — cada una verifica cookie
+- **Fallback**: Mock data en `data/mock/dashboard-metrics.json` cuando env vars no configuradas
+- **Layout**: `max-w-7xl`, grid 2-col en desktop
+- **No aparece en nav** — acceso solo por URL directa
+
+### Env vars (server-side, en Vercel)
+
+```
+DASHBOARD_PASSWORD=<elegido por el usuario>
+UMAMI_API_URL=https://analytics.cobalto-sec.tech
+UMAMI_USERNAME=admin
+UMAMI_PASSWORD=cobalto_umami_2026
+UMAMI_WEBSITE_ID=10dd27da-b625-49ce-900a-8033a98167ed
+CF_API_TOKEN=<token Cloudflare>
+CF_ZONE_ID=85411ee5b08aae9f73c6a84a47ea3c11
+EMAIL_METRICS_URL=<R2 URL, configurar después>
+GSC_CREDENTIALS=<JSON string del service account>
+GSC_SITE_URL=sc-domain:cobalto-sec.tech
+```
+
 ## Features Pendientes (prioridad)
 
 1. **Alta**: Filtro de posts por proyecto (`/projects/[slug]/posts`)
-2. **Media**: Newsletter/Contact form
-3. **Media**: Related posts automáticos
-4. **Baja**: Comentarios (Giscus)
-5. **Deuda técnica**: Post `de-nmap-a-python-mejorado.mdx` sin fecha en nombre
+2. **Media**: Related posts automáticos
+3. **Baja**: Comentarios (Giscus)
+4. **Deuda técnica**: Post `de-nmap-a-python-mejorado.mdx` sin fecha en nombre
 
 ## Perfiles del autor
 
@@ -157,6 +184,7 @@ Expandir Cobalto-Sec con un sistema de métricas, automaciones y contenido que f
 | ----------------- | ------------- | ------------------- | ------- | ------------------------------------------ |
 | **n8n**           | `mp-n8n`      | `192.168.0.14:5678` | Running | `admin` / `cobalto_n8n_2026`               |
 | **PostgreSQL 16** | `mp-postgres` | `192.168.0.14:5432` | Healthy | DB: `marcapersonal`, user: `marcapersonal` |
+| **Umami**         | `mp-umami`    | `192.168.0.14:3000` | Running | `admin` / `cobalto_umami_2026`             |
 
 ### Archivos en LXC 104
 
@@ -170,15 +198,15 @@ Expandir Cobalto-Sec con un sistema de métricas, automaciones y contenido que f
   config/               # Configs adicionales (futuro)
 ```
 
-### Qué va en la web (este repo) - POR IMPLEMENTAR
+### Qué va en la web (este repo)
 
-| Componente                   | Ubicación                       | Descripción                                                                            |
-| ---------------------------- | ------------------------------- | -------------------------------------------------------------------------------------- |
-| Dashboard de métricas        | `/app/dashboard/`               | Página con stats agregadas (visitas, GitHub stars, posts publicados, LinkedIn metrics) |
-| Componente MetricsCard       | `/components/MetricsCard.tsx`   | Card reutilizable para mostrar KPIs                                                    |
-| API route de métricas        | `/app/api/metrics/`             | Proxy que consulta al backend LXC 104                                                  |
-| Sección "Actividad reciente" | En homepage o `/about`          | Feed de actividad (commits, posts, certificaciones)                                    |
-| Página de logros/certs       | `/app/achievements/` (opcional) | Certificaciones, badges, timeline profesional                                          |
+| Componente                   | Ubicación                       | Estado       |
+| ---------------------------- | ------------------------------- | ------------ |
+| Dashboard de métricas        | `/app/dashboard/`               | IMPLEMENTADO |
+| MetricCard + Sparkline       | `/components/dashboard/`        | IMPLEMENTADO |
+| API routes dashboard         | `/app/api/dashboard/{5 routes}` | IMPLEMENTADO |
+| Sección "Actividad reciente" | En homepage o `/about`          | Pendiente    |
+| Página de logros/certs       | `/app/achievements/` (opcional) | Pendiente    |
 
 ### Qué falta en LXC 104 - POR IMPLEMENTAR
 
@@ -227,7 +255,7 @@ Recomendación: empezar sin LinkedIn, agregar cuando haya una solución estable.
 ### Fases sugeridas
 
 **Fase 1 - Base**: Setup LXC 104, instalar n8n, crear API de métricas con GitHub + RSS
-**Fase 2 - Analytics**: Integrar GA4/Umami, dashboard en la web
+**Fase 2 - Analytics**: Integrar GA4/Umami, dashboard en la web (**COMPLETADA** — dashboard desplegado 2026-02-06)
 **Fase 3 - Automaciones**: Auto-publicar en redes, digest semanal, alertas
 **Fase 4 - LinkedIn**: Explorar integración cuando haya API access estable
 
@@ -235,10 +263,12 @@ Recomendación: empezar sin LinkedIn, agregar cuando haya una solución estable.
 
 - [x] Base de datos: **PostgreSQL 16** (desplegado en LXC 104)
 - [x] Orquestación: **n8n** con persistencia en PostgreSQL (desplegado)
+- [x] Autenticación del dashboard: **Privado** (password + cookie SHA256)
+- [x] Dashboard: **Next.js API routes** (sin backend separado, cada sección llama su fuente directo)
+- [x] Umami: **Self-hosted** en LXC 104, expuesto vía Cloudflare Tunnel
 
 ### Decisiones pendientes
 
-- [ ] Lenguaje del backend API (Node.js vs Python FastAPI)
-- [ ] Autenticación del dashboard (público vs privado)
-- [ ] Dominio/subdominio para API (`api.cobalto-sec.tech` vs ruta interna)
+- [ ] Dominio/subdominio para API REST de métricas (`api.cobalto-sec.tech` vs ruta interna)
 - [ ] Tailscale en LXC 104 para acceso remoto
+- [ ] Cron en LXC 104 para subir `email.json` a R2 (Email Outreach sección)

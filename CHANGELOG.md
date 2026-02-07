@@ -6,6 +6,35 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [B4 - Dashboard + Umami + CSP] - 2026-02-06
+
+### Agregado
+
+- `/dashboard` — Dashboard privado de métricas con password auth (cookie SHA256)
+  - 5 API routes: `/api/dashboard/{auth,umami,cloudflare,email,gsc}`
+  - 8 componentes: DashboardShell, MetricCard, Sparkline, WebTrafficSection, InfraSection, EmailSection, SeoSection, LinkedInSection
+  - Mock data fallback cuando env vars no están configuradas
+  - Grid 2-col desktop, secciones independientes con loading/error states
+- Umami self-hosted (LXC 104, container mp-umami, puerto 3000)
+  - Website ID: `10dd27da-b625-49ce-900a-8033a98167ed`
+  - Tracking script inyectado via `next/script` (hardcoded, no env vars en SSG)
+
+### Corregido
+
+- CSP: hardcodear `analytics.cobalto-sec.tech` en `script-src` (env vars no disponibles en SSG build)
+- CSP: permitir `static.cloudflareinsights.com` en `script-src`
+- Umami script: env vars no se resuelven en build time → inyección directa con URL hardcoded
+
+### Env vars nuevas (Vercel, server-side)
+
+- `DASHBOARD_PASSWORD` — Password para acceso al dashboard
+- `UMAMI_API_URL`, `UMAMI_USERNAME`, `UMAMI_PASSWORD`, `UMAMI_WEBSITE_ID` — Umami API
+- `CF_API_TOKEN`, `CF_ZONE_ID` — Cloudflare GraphQL
+- `EMAIL_METRICS_URL` — R2 URL para métricas de email
+- `GSC_CREDENTIALS`, `GSC_SITE_URL` — Google Search Console service account
+
+---
+
 ## [B2 - Análisis Web] - 2026-02-03
 
 ### Analizado
