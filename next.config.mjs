@@ -69,6 +69,12 @@ const config = () => {
     async headers() {
       return [{ source: "/(.*)", headers: securityHeaders }]
     },
+    async redirects() {
+      return [
+        { source: "/services", destination: "/servicios", permanent: true },
+        { source: "/about", destination: "/sobre", permanent: true },
+      ]
+    },
     webpack: (config) => {
       config.module.rules.push({ test: /\.svg$/, use: ["@svgr/webpack"] })
       return config

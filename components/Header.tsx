@@ -5,6 +5,7 @@ import Link from './Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
+import NavDropdown from './NavDropdown'
 
 const Header = () => {
   let headerClass = 'flex items-center w-full justify-between py-6 transition-all duration-300'
@@ -25,12 +26,14 @@ const Header = () => {
           {headerNavLinks
             .filter((link) => link.href !== '/')
             .map((link) => {
-              const isServices = link.href === '/services'
+              if (link.children) {
+                return <NavDropdown key={link.title} title={link.title} items={link.children} />
+              }
               return (
                 <Link
                   key={link.title}
-                  href={link.href}
-                  className={`link-underline font-medium whitespace-nowrap ${isServices ? 'text-red-500 hover:text-red-400 dark:text-red-400 dark:hover:text-red-300' : 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100'}`}
+                  href={link.href!}
+                  className="link-underline font-medium whitespace-nowrap text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                 >
                   {link.title}
                 </Link>

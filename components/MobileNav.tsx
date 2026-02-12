@@ -26,6 +26,19 @@ const MobileNav = () => {
     return clearAllBodyScrollLocks
   })
 
+  // Flatten nav links for mobile: dropdown children become indented items
+  const flatLinks: { href: string; title: string; indent?: boolean }[] = []
+  for (const link of headerNavLinks) {
+    if (link.children) {
+      flatLinks.push({ href: link.children[0].href, title: link.title })
+      for (const child of link.children) {
+        flatLinks.push({ href: child.href, title: child.title, indent: true })
+      }
+    } else if (link.href) {
+      flatLinks.push({ href: link.href, title: link.title })
+    }
+  }
+
   return (
     <>
       <button aria-label="Toggle Menu" onClick={onToggleNav} className="sm:hidden">
@@ -72,14 +85,16 @@ const MobileNav = () => {
                 ref={navRef}
                 className="mt-8 flex h-full basis-0 flex-col items-start overflow-y-auto pt-2 pl-12 text-left"
               >
-                {headerNavLinks.map((link) => (
+                {flatLinks.map((link) => (
                   <Link
-                    key={link.title}
+                    key={link.href + link.title}
                     href={link.href}
-                    className="hover:text-primary-500 dark:hover:text-primary-400 mb-4 py-2 pr-4 text-2xl font-bold tracking-widest text-gray-900 outline outline-0 dark:text-gray-100"
+                    className={`hover:text-primary-500 dark:hover:text-primary-400 mb-4 py-2 pr-4 font-bold tracking-widest text-gray-900 outline outline-0 dark:text-gray-100 ${
+                      link.indent ? 'pl-4 text-lg text-gray-600 dark:text-gray-400' : 'text-2xl'
+                    }`}
                     onClick={onToggleNav}
                   >
-                    {link.title}
+                    {link.indent ? `— ${link.title}` : link.title}
                   </Link>
                 ))}
               </nav>

@@ -17,7 +17,31 @@
       "WebFetch(domain:www.deltaprotect.com)",
       "WebFetch(domain:www.pethuraj.com)",
       "WebFetch(domain:danielmiessler.com)",
-      "WebFetch(domain:www.fidusinfoecurity.com)"
+      "WebFetch(domain:www.fidusinfoecurity.com)",
+      "Bash(python3:*)",
+      "Bash(scp:*)",
+      "Bash(curl:*)",
+      "WebFetch(domain:pub-60494eebccb34036a63a5d8dbbb9f43d.r2.dev)",
+      "Bash(vercel:*)",
+      "Bash(npx vercel:*)",
+      "WebFetch(domain:umami.is)",
+      "WebSearch",
+      "WebFetch(domain:docs.umami.is)",
+      "WebFetch(domain:claytonerrington.com)",
+      "WebFetch(domain:lewisdale.dev)",
+      "Bash(pip install:*)",
+      "Bash(python scripts/umami_metrics.py:*)",
+      "Bash(python -c \"\nimport requests, time\n\n# Login\nr = requests.post\\(''https://analytics.cobalto-sec.tech/api/auth/login'', json={''username'':''admin'',''password'':''cobalto_umami_2026''}\\)\ntoken = r.json\\(\\)[''token'']\n\nnow = int\\(time.time\\(\\) * 1000\\)\nweek_ago = now - 7*24*60*60*1000\n\n# Test stats endpoint\nr1 = requests.get\\(f''https://analytics.cobalto-sec.tech/api/websites/10dd27da-b625-49ce-900a-8033a98167ed/stats?startAt={week_ago}&endAt={now}'', headers={''Authorization'': f''Bearer {token}''}\\)\nprint\\(''Stats:'', r1.status_code, r1.text[:200]\\)\n\n# Test metrics with type=url\nr2 = requests.get\\(f''https://analytics.cobalto-sec.tech/api/websites/10dd27da-b625-49ce-900a-8033a98167ed/metrics?startAt={week_ago}&endAt={now}&type=url'', headers={''Authorization'': f''Bearer {token}''}\\)\nprint\\(''Metrics url:'', r2.status_code, r2.text[:300]\\)\n\n# Test active-visitors\nr3 = requests.get\\(f''https://analytics.cobalto-sec.tech/api/websites/10dd27da-b625-49ce-900a-8033a98167ed/active'', headers={''Authorization'': f''Bearer {token}''}\\)\nprint\\(''Active:'', r3.status_code, r3.text[:200]\\)\n\")",
+      "Bash(python -c \"\nimport requests, time\n\nr = requests.post\\(''https://analytics.cobalto-sec.tech/api/auth/login'', json={''username'':''admin'',''password'':''cobalto_umami_2026''}\\)\ntoken = r.json\\(\\)[''token'']\nh = {''Authorization'': f''Bearer {token}''}\n\nnow = int\\(time.time\\(\\) * 1000\\)\nweek_ago = now - 7*24*60*60*1000\nbase = ''https://analytics.cobalto-sec.tech/api/websites/10dd27da-b625-49ce-900a-8033a98167ed''\n\n# Try different param names\nfor param in [''type'', ''metric'', ''column'']:\n    r = requests.get\\(f''{base}/metrics?startAt={week_ago}&endAt={now}&{param}=url'', headers=h\\)\n    print\\(f''metrics?{param}=url → {r.status_code}''\\)\n\n# Try POST instead of GET\nr = requests.post\\(f''{base}/metrics'', json={''startAt'': week_ago, ''endAt'': now, ''type'': ''url''}, headers=h\\)\nprint\\(f''POST metrics → {r.status_code} {r.text[:200]}''\\)\n\n# Try pageviews endpoint\nr = requests.get\\(f''{base}/pageviews?startAt={week_ago}&endAt={now}&unit=day'', headers=h\\)\nprint\\(f''pageviews → {r.status_code} {r.text[:300]}''\\)\n\")",
+      "Bash(python -c \"\nimport requests, time, json\n\nr = requests.post\\(''https://analytics.cobalto-sec.tech/api/auth/login'', json={''username'':''admin'',''password'':''cobalto_umami_2026''}\\)\ntoken = r.json\\(\\)[''token'']\nh = {''Authorization'': f''Bearer {token}'', ''Content-Type'': ''application/json''}\nbase = ''https://analytics.cobalto-sec.tech/api/websites/10dd27da-b625-49ce-900a-8033a98167ed''\nnow = int\\(time.time\\(\\) * 1000\\)\nweek_ago = now - 7*24*60*60*1000\n\n# Umami v3 uses ''type'' differently - try specific field names from v3 docs\nfor t in [''url'', ''referrer'', ''browser'', ''os'', ''device'', ''country'', ''event'', ''language'', ''title'', ''screen'', ''city'', ''region'']:\n    r = requests.get\\(f''{base}/metrics?startAt={week_ago}&endAt={now}&type={t}'', headers=h\\)\n    if r.status_code == 200:\n        print\\(f''type={t} → OK: {r.text[:100]}''\\)\n    else:\n        pass  # skip 400s\n\n# Try without type parameter at all\nr = requests.get\\(f''{base}/metrics?startAt={week_ago}&endAt={now}'', headers=h\\)\nprint\\(f''no type → {r.status_code} {r.text[:200]}''\\)\n\")",
+      "Bash(python -c \"\nimport requests, time\n\nr = requests.post\\(''https://analytics.cobalto-sec.tech/api/auth/login'', json={''username'':''admin'',''password'':''cobalto_umami_2026''}\\)\ntoken = r.json\\(\\)[''token'']\nh = {''Authorization'': f''Bearer {token}''}\nbase = ''https://analytics.cobalto-sec.tech/api/websites/10dd27da-b625-49ce-900a-8033a98167ed''\nnow = int\\(time.time\\(\\) * 1000\\)\nweek_ago = now - 7*24*60*60*1000\n\nfor t in [''url'', ''path'', ''page'', ''url_path'', ''pathname'']:\n    r = requests.get\\(f''{base}/metrics?startAt={week_ago}&endAt={now}&type={t}'', headers=h\\)\n    print\\(f''type={t} → {r.status_code} {r.text[:150]}''\\)\n\")",
+      "Bash(python scripts/cloudflare_analytics.py:*)",
+      "Bash(python scripts/gsc_metrics.py:*)",
+      "Bash(python scripts/email_metrics.py:*)",
+      "Bash(python scripts/collect_all_metrics.py:*)",
+      "Bash(git init:*)",
+      "Bash(python:*)",
+      "Bash(echo:*)"
     ]
   }
 }

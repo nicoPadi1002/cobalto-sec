@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer
       className="mt-16 border-t bg-gray-50 pt-12 pb-8 dark:bg-gray-900/50"
-      aria-label="Pie de página"
+      aria-label="Pie de pagina"
     >
       <div className="mx-auto max-w-7xl px-4">
         {/* Main footer content */}
@@ -18,8 +18,8 @@ export default function Footer() {
               {siteMetadata.title}
             </h3>
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-              Pentesting, auditorías de seguridad y consultoría ofensiva. Proyectos reales en
-              producción, código abierto, documentación detallada.
+              Pentesting, auditorias de seguridad y consultoria ofensiva. Proyectos reales en
+              produccion, codigo abierto, documentacion detallada.
             </p>
             <div className="flex gap-4">
               {siteMetadata.github && (
@@ -72,39 +72,27 @@ export default function Footer() {
           {/* Navigation */}
           <div>
             <h3 className="mb-4 text-sm font-semibold tracking-wider text-gray-900 uppercase dark:text-gray-100">
-              Navegación
+              Navegacion
             </h3>
             <nav className="flex flex-col gap-2">
-              <Link
-                href="/services"
-                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
-              >
-                Servicios
-              </Link>
-              <Link
-                href="/blog"
-                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
-              >
-                Blog
-              </Link>
-              <Link
-                href="/projects"
-                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
-              >
-                Proyectos
-              </Link>
-              <Link
-                href="/tags"
-                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
-              >
-                Etiquetas
-              </Link>
-              <Link
-                href="/about"
-                className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
-              >
-                Acerca
-              </Link>
+              {[
+                { href: '/servicios/pentesting-para-empresas', label: 'Pentesting' },
+                { href: '/servicios/auditoria-ciberseguridad-pymes', label: 'Auditoria' },
+                { href: '/precios', label: 'Precios' },
+                { href: '/metodologia', label: 'Metodologia' },
+                { href: '/casos', label: 'Casos' },
+                { href: '/sobre', label: 'Sobre' },
+                { href: '/faq', label: 'FAQ' },
+                { href: '/blog', label: 'Blog' },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm text-gray-600 transition-colors hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
+                >
+                  {item.label}
+                </Link>
+              ))}
             </nav>
           </div>
 
@@ -140,7 +128,7 @@ export default function Footer() {
         <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              © {year} {siteMetadata.author} • {siteMetadata.title}
+              &copy; {year} {siteMetadata.author} &bull; {siteMetadata.title}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Hecho con{' '}
