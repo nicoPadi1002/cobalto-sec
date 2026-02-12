@@ -22,7 +22,7 @@ const Header = () => {
         </div>
       </Link>
       <div className="flex items-center space-x-3 leading-5 sm:space-x-5">
-        <div className="no-scrollbar hidden max-w-40 items-center gap-x-5 overflow-x-auto sm:flex md:max-w-72 lg:max-w-96">
+        <div className="hidden items-center gap-x-5 sm:flex">
           {headerNavLinks
             .filter((link) => link.href !== '/')
             .map((link) => {
