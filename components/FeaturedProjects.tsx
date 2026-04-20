@@ -45,13 +45,13 @@ export default function FeaturedProjects() {
                   <div className="mt-4 grid grid-cols-2 gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Sesiones</p>
-                      <p className="font-mono text-lg font-bold text-cyan-600 dark:text-cyan-400">
+                      <p className="font-mono text-lg font-bold text-amber-600 dark:text-amber-400">
                         81.7K+
                       </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">IPs Únicas</p>
-                      <p className="font-mono text-lg font-bold text-cyan-600 dark:text-cyan-400">
+                      <p className="font-mono text-lg font-bold text-amber-600 dark:text-amber-400">
                         640+
                       </p>
                     </div>
@@ -62,13 +62,13 @@ export default function FeaturedProjects() {
                   <div className="mt-4 grid grid-cols-2 gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Eventos/hora</p>
-                      <p className="font-mono text-lg font-bold text-cyan-600 dark:text-cyan-400">
+                      <p className="font-mono text-lg font-bold text-amber-600 dark:text-amber-400">
                         500+
                       </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Uptime</p>
-                      <p className="font-mono text-lg font-bold text-cyan-600 dark:text-cyan-400">
+                      <p className="font-mono text-lg font-bold text-amber-600 dark:text-amber-400">
                         99.8%
                       </p>
                     </div>

@@ -94,7 +94,7 @@ const MobileNav = () => {
                     }`}
                     onClick={onToggleNav}
                   >
-                    {link.indent ? `— ${link.title}` : link.title}
+                    {link.indent ? `— ${link.title}` : `[ ${link.title} ]`}
                   </Link>
                 ))}
               </nav>

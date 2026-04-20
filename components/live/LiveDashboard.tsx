@@ -176,7 +176,7 @@ export default function LiveDashboard() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={stat.icon} />
             </svg>
-            <p className="font-mono text-3xl font-bold tracking-tight text-cyan-600 sm:text-4xl dark:text-cyan-400">
+            <p className="font-mono text-3xl font-bold tracking-tight text-amber-600 sm:text-4xl dark:text-amber-400">
               {stat.value}
             </p>
             <p className="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">

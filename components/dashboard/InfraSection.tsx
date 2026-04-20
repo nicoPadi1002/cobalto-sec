@@ -88,7 +88,7 @@ export default function InfraSection() {
             {data.topCountries.map((c, i) => (
               <div key={i} className="flex items-center justify-between text-sm">
                 <span className="text-gray-300">{c.name}</span>
-                <span className="font-mono text-cyan-400">{c.requests.toLocaleString()}</span>
+                <span className="font-mono text-amber-400">{c.requests.toLocaleString()}</span>
               </div>
             ))}
           </div>

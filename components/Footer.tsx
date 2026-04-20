@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import siteMetadata from '@/data/siteMetadata'
+import BugMascot from './BugMascot'
+import CrtToggle from './CrtToggle'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -124,32 +126,58 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* PGP fingerprint (optional — requires NEXT_PUBLIC_PGP_FINGERPRINT env var) */}
+        {process.env.NEXT_PUBLIC_PGP_FINGERPRINT && (
+          <div className="mt-10 rounded-lg border border-gray-300 bg-white p-4 dark:border-gray-800 dark:bg-gray-900/50">
+            <p className="font-mono text-[10px] tracking-widest text-red-500 uppercase dark:text-red-400">
+              [ verify · pgp fingerprint ]
+            </p>
+            <code className="font-pixel mt-2 block text-[9px] leading-relaxed break-all text-gray-700 dark:text-gray-300">
+              {process.env.NEXT_PUBLIC_PGP_FINGERPRINT}
+            </code>
+            <a
+              href="/pgp.asc"
+              className="mt-2 inline-block font-mono text-[10px] text-red-500 hover:underline dark:text-red-400"
+            >
+              public_key.asc →
+            </a>
+          </div>
+        )}
+
         {/* Bottom bar */}
         <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              &copy; {year} {siteMetadata.author} &bull; {siteMetadata.title}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Hecho con{' '}
-              <a
-                href="https://nextjs.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-red-500 hover:underline dark:text-red-400"
-              >
-                Next.js
-              </a>{' '}
-              y{' '}
-              <a
-                href="https://tailwindcss.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-red-500 hover:underline dark:text-red-400"
-              >
-                Tailwind CSS
-              </a>
-            </p>
+            <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-red-600 dark:text-red-500">
+                <BugMascot mode="static" size="sm" />
+              </span>
+              <p>
+                &copy; {year} {siteMetadata.author} &bull; {siteMetadata.title}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <CrtToggle />
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Hecho con{' '}
+                <a
+                  href="https://nextjs.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-red-500 hover:underline dark:text-red-400"
+                >
+                  Next.js
+                </a>{' '}
+                y{' '}
+                <a
+                  href="https://tailwindcss.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-red-500 hover:underline dark:text-red-400"
+                >
+                  Tailwind CSS
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </div>

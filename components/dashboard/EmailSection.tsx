@@ -83,7 +83,7 @@ export default function EmailSection() {
               <span className="w-16 text-right text-xs text-gray-400">{step.label}</span>
               <div className="relative h-7 flex-1 overflow-hidden rounded-md bg-gray-800">
                 <div
-                  className="absolute inset-y-0 left-0 rounded-md bg-gradient-to-r from-red-500 to-cyan-500"
+                  className="absolute inset-y-0 left-0 rounded-md bg-gradient-to-r from-red-500 to-amber-500"
                   style={{ width: `${(step.value / maxFunnel) * 100}%` }}
                 />
                 <span className="relative z-10 flex h-full items-center px-3 font-mono text-xs text-white">
@@ -103,7 +103,7 @@ export default function EmailSection() {
             {data.topTemplates.map((t, i) => (
               <div key={i} className="flex items-center justify-between text-sm">
                 <span className="max-w-[60%] truncate text-gray-300">{t.name}</span>
-                <span className="font-mono text-xs text-cyan-400">
+                <span className="font-mono text-xs text-amber-400">
                   {t.sent}s / {t.opened}o / {t.clicked}c
                 </span>
               </div>

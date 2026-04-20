@@ -49,7 +49,7 @@ export default function DashboardShell() {
   if (checking) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
       </div>
     )
   }
@@ -67,7 +67,7 @@ export default function DashboardShell() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 placeholder-gray-500 focus:border-cyan-500 focus:outline-none"
+            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 placeholder-gray-500 focus:border-amber-500 focus:outline-none"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
           />
@@ -75,7 +75,7 @@ export default function DashboardShell() {
           <button
             type="submit"
             disabled={submitting || !password}
-            className="mt-4 w-full rounded-lg bg-cyan-600 py-3 font-semibold text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
+            className="mt-4 w-full rounded-lg bg-amber-600 py-3 font-semibold text-white transition-colors hover:bg-amber-500 disabled:opacity-50"
           >
             {submitting ? 'Verificando...' : 'Acceder'}
           </button>

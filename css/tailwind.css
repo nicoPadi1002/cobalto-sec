@@ -3,8 +3,15 @@
 @plugin '@tailwindcss/typography';
 @source '../node_modules/pliny';
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant crt (&:where([data-crt=on], [data-crt=on] *));
 
-/* Core theme configuration */
+/* ────────────────────────────────────────────────────────────
+   CobaltoSec — "Amber CRT" palette
+   Anchor: sangre #dc2626 | Acento: phosphor amber #ffb000
+   Neutrals: warm (hue ~60-80, low chroma)
+   Dark base: warm-black #0a0908 | Light base: paper #f5f0e8
+   ──────────────────────────────────────────────────────────── */
+
 @theme {
   /* Font families */
   --font-sans:
@@ -15,30 +22,64 @@
     var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
     'Liberation Mono', monospace;
 
-  /* Colors - Red (offensive accent) */
-  --color-primary-50: oklch(0.971 0.013 17.38);
-  --color-primary-100: oklch(0.936 0.032 17.717);
-  --color-primary-200: oklch(0.885 0.062 18.334);
-  --color-primary-300: oklch(0.808 0.114 19.571);
-  --color-primary-400: oklch(0.704 0.191 22.216);
-  --color-primary-500: oklch(0.637 0.237 25.331);
-  --color-primary-600: oklch(0.577 0.245 27.325);
-  --color-primary-700: oklch(0.505 0.213 27.518);
-  --color-primary-800: oklch(0.444 0.177 26.899);
-  --color-primary-900: oklch(0.396 0.141 25.723);
-  --color-primary-950: oklch(0.258 0.092 26.042);
+  --font-pixel: var(--font-press-start-2p), ui-monospace, Menlo, Consolas, monospace;
 
-  --color-gray-50: oklch(0.985 0.002 247.839);
-  --color-gray-100: oklch(0.967 0.003 264.542);
-  --color-gray-200: oklch(0.928 0.006 264.531);
-  --color-gray-300: oklch(0.872 0.01 258.338);
-  --color-gray-400: oklch(0.707 0.022 261.325);
-  --color-gray-500: oklch(0.551 0.027 264.364);
-  --color-gray-600: oklch(0.446 0.03 256.802);
-  --color-gray-700: oklch(0.373 0.034 259.733);
-  --color-gray-800: oklch(0.278 0.033 256.848);
-  --color-gray-900: oklch(0.21 0.034 264.665);
-  --color-gray-950: oklch(0.13 0.028 261.692);
+  /* ── Primary = sangre (rojo anchor) ─────────────────────── */
+  --color-primary-50: oklch(0.968 0.013 25);
+  --color-primary-100: oklch(0.928 0.033 26);
+  --color-primary-200: oklch(0.868 0.072 27);
+  --color-primary-300: oklch(0.788 0.132 27);
+  --color-primary-400: oklch(0.684 0.201 27);
+  --color-primary-500: oklch(0.602 0.237 27);
+  --color-primary-600: oklch(0.55 0.245 27); /* ≈ #dc2626 sangre */
+  --color-primary-700: oklch(0.482 0.217 27);
+  --color-primary-800: oklch(0.418 0.182 27);
+  --color-primary-900: oklch(0.372 0.146 27);
+  --color-primary-950: oklch(0.244 0.094 27);
+
+  /* ── Red ramp overridden to match sangre (re-tinta los 271 usos hardcoded de red-* sin find/replace) ── */
+  --color-red-50: oklch(0.968 0.013 25);
+  --color-red-100: oklch(0.928 0.033 26);
+  --color-red-200: oklch(0.868 0.072 27);
+  --color-red-300: oklch(0.788 0.132 27);
+  --color-red-400: oklch(0.684 0.201 27);
+  --color-red-500: oklch(0.602 0.237 27);
+  --color-red-600: oklch(0.55 0.245 27); /* ≈ #dc2626 sangre */
+  --color-red-700: oklch(0.482 0.217 27);
+  --color-red-800: oklch(0.418 0.182 27);
+  --color-red-900: oklch(0.372 0.146 27);
+  --color-red-950: oklch(0.244 0.094 27);
+
+  /* ── Amber phosphor CRT ─────────────────────────────────── */
+  /* Centered at #ffb000 (VT100 / IBM 80s terminal) */
+  --color-amber-50: oklch(0.982 0.02 85);
+  --color-amber-100: oklch(0.956 0.042 83);
+  --color-amber-200: oklch(0.91 0.082 82);
+  --color-amber-300: oklch(0.862 0.122 81);
+  --color-amber-400: oklch(0.812 0.16 80);
+  --color-amber-500: oklch(0.812 0.172 79); /* ≈ #ffb000 phosphor */
+  --color-amber-600: oklch(0.724 0.165 65);
+  --color-amber-700: oklch(0.612 0.144 55);
+  --color-amber-800: oklch(0.5 0.112 50);
+  --color-amber-900: oklch(0.416 0.088 48);
+  --color-amber-950: oklch(0.262 0.056 48);
+
+  /* ── Gray ramp: warm-neutral (hue ~70, chroma ~0.01) ────── */
+  --color-gray-50: oklch(0.982 0.006 75);
+  --color-gray-100: oklch(0.962 0.008 72);
+  --color-gray-200: oklch(0.918 0.01 70);
+  --color-gray-300: oklch(0.858 0.012 68);
+  --color-gray-400: oklch(0.694 0.014 66);
+  --color-gray-500: oklch(0.542 0.014 64);
+  --color-gray-600: oklch(0.438 0.014 62);
+  --color-gray-700: oklch(0.362 0.014 60);
+  --color-gray-800: oklch(0.27 0.012 58);
+  --color-gray-900: oklch(0.2 0.01 56);
+  --color-gray-950: oklch(0.13 0.01 54);
+
+  /* ── Background customs (warm bases) ────────────────────── */
+  --color-bg-dark: #0a0908; /* warm-black */
+  --color-bg-light: #f5f0e8; /* paper off-white */
 
   /* Line heights */
   --line-height-11: 2.75rem;
@@ -55,6 +96,9 @@
   --animate-fade-in: fade-in 0.7s ease-out forwards;
   --animate-circuit-drift: circuit-drift 30s linear infinite;
   --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
+  --animate-cursor-blink: cursor-blink 1.1s steps(1, end) infinite;
+  --animate-count-up: count-up 1.5s ease-out forwards;
+  --animate-bug-walk: bug-walk 0.7s ease-in-out infinite;
 }
 
 @layer base {
@@ -162,7 +206,36 @@
       width: 100%;
     }
   }
+
+  /* Pixel font utility — uso restringido (mascot label, stat numbers, PGP fingerprint) */
+  .font-pixel {
+    font-family: var(--font-pixel);
+    letter-spacing: 0.02em;
+  }
 }
+
+/* ────────────────────────────────────────────────────────────
+   CRT mode (orthogonal, activated via data-crt=on)
+   Scoped overlay: scanlines + phosphor glow
+   ──────────────────────────────────────────────────────────── */
+
+html[data-crt='on'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: multiply;
+}
+
+html[data-crt='on'] body {
+  text-shadow: 0 0 1.5px currentColor;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Keyframes
+   ──────────────────────────────────────────────────────────── */
 
 @keyframes fade-in {
   from {
@@ -189,6 +262,60 @@
   }
   50% {
     opacity: 0.8;
+  }
+}
+
+@keyframes cursor-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bug-walk {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(4deg);
+  }
+}
+
+.bug-squashed {
+  display: inline-block;
+  transform: scaleY(0.45) scaleX(1.15) rotate(8deg);
+  opacity: 0.85;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.2));
+}
+
+@keyframes scanlines {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(3px);
   }
 }
 

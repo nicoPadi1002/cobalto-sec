@@ -41,13 +41,13 @@ const NavDropdown = ({ title, items }: NavDropdownProps) => {
     >
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`link-underline flex items-center gap-1 font-medium whitespace-nowrap ${
+        className={`link-underline flex items-center gap-1 font-mono text-sm whitespace-nowrap ${
           isActive
             ? 'text-red-500 dark:text-red-400'
             : 'text-red-500 hover:text-red-400 dark:text-red-400 dark:hover:text-red-300'
         }`}
       >
-        {title}
+        <span>[</span> {title} <span>]</span>
         <svg
           className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`}
           fill="none"

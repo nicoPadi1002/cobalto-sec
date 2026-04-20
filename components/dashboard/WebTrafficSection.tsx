@@ -82,7 +82,7 @@ function DataTable({ title, rows }: { title: string; rows: [string, number][] })
         {rows.map(([label, value], i) => (
           <div key={i} className="flex items-center justify-between text-sm">
             <span className="max-w-[70%] truncate text-gray-300">{label}</span>
-            <span className="font-mono text-cyan-400">{value.toLocaleString()}</span>
+            <span className="font-mono text-amber-400">{value.toLocaleString()}</span>
           </div>
         ))}
       </div>

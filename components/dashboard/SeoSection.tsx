@@ -92,16 +92,16 @@ export default function SeoSection() {
                 <p className="truncate text-sm text-gray-200">{q.query}</p>
                 <div className="mt-1 flex gap-3 font-mono text-xs text-gray-400">
                   <span>
-                    <span className="text-cyan-400">{q.clicks}</span> clicks
+                    <span className="text-amber-400">{q.clicks}</span> clicks
                   </span>
                   <span>
-                    <span className="text-cyan-400">{q.impressions}</span> imp
+                    <span className="text-amber-400">{q.impressions}</span> imp
                   </span>
                   <span>
-                    <span className="text-cyan-400">{q.ctr}%</span> CTR
+                    <span className="text-amber-400">{q.ctr}%</span> CTR
                   </span>
                   <span>
-                    pos <span className="text-cyan-400">{q.position}</span>
+                    pos <span className="text-amber-400">{q.position}</span>
                   </span>
                 </div>
               </div>

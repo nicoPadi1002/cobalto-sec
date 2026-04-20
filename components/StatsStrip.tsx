@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import mockData from '@/data/mock/honeypot-live.json'
 
@@ -33,6 +33,8 @@ function buildStats(s: HoneypotStats) {
 
 export default function StatsStrip() {
   const [stats, setStats] = useState(() => buildStats(mockData.stats))
+  const [visible, setVisible] = useState(false)
+  const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     async function load() {
@@ -48,6 +50,27 @@ export default function StatsStrip() {
     load()
   }, [])
 
+  useEffect(() => {
+    const el = gridRef.current
+    if (!el) return
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduceMotion) {
+      setVisible(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.25 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <section className="relative -mx-4 overflow-hidden px-4 py-16 sm:-mx-6 sm:px-6 sm:py-20">
       {/* Subtle gradient background */}
@@ -55,18 +78,21 @@ export default function StatsStrip() {
 
       <div className="mx-auto max-w-5xl">
         <div className="mb-10 text-center">
-          <p className="text-sm font-semibold tracking-widest text-red-500 uppercase dark:text-red-400">
-            Datos reales de sistemas en producción
+          <p className="font-mono text-sm tracking-widest text-red-500 uppercase dark:text-red-400">
+            [ datos reales · sistemas en producción ]
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 sm:gap-6">
+        <div ref={gridRef} className="grid grid-cols-3 gap-4 sm:gap-6">
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="group rounded-xl border border-gray-200 bg-white p-5 text-center transition-all duration-300 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5 sm:p-6 dark:border-gray-800 dark:bg-gray-900/50 dark:hover:border-red-500/30 dark:hover:shadow-red-500/10"
+              className={`group rounded-xl border border-gray-200 bg-white p-5 text-center transition-all duration-300 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5 sm:p-6 dark:border-gray-800 dark:bg-gray-900/50 dark:hover:border-red-500/30 dark:hover:shadow-red-500/10 ${
+                visible ? 'animate-count-up' : 'opacity-0'
+              }`}
+              style={{ animationDelay: `${index * 120}ms` }}
             >
-              <p className="font-mono text-3xl font-bold tracking-tight text-cyan-600 sm:text-4xl dark:text-cyan-400">
+              <p className="font-pixel min-h-[3rem] text-2xl leading-tight text-amber-600 sm:min-h-[4rem] sm:text-3xl dark:text-amber-400">
                 {stat.value}
               </p>
               <p className="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -81,7 +107,7 @@ export default function StatsStrip() {
         <div className="mt-10 flex flex-col items-center gap-6">
           <Link
             href="/live"
-            className="inline-flex items-center gap-2 rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-5 py-2.5 text-sm font-semibold text-cyan-600 transition-all hover:border-cyan-500 hover:bg-cyan-500/20 hover:shadow-lg hover:shadow-cyan-500/10 dark:text-cyan-400 dark:hover:border-cyan-400 dark:hover:shadow-cyan-400/10"
+            className="inline-flex items-center gap-2 rounded-lg border border-amber-500/50 bg-amber-500/10 px-5 py-2.5 text-sm font-semibold text-amber-600 transition-all hover:border-amber-500 hover:bg-amber-500/20 hover:shadow-lg hover:shadow-amber-500/10 dark:text-amber-400 dark:hover:border-amber-400 dark:hover:shadow-amber-400/10"
           >
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />

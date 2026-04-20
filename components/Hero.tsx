@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import BugMascot from './BugMascot'
 
 export default function Hero() {
   return (
@@ -8,19 +9,25 @@ export default function Hero() {
 
       {/* Glow accents */}
       <div className="absolute -top-24 left-1/2 -z-10 h-96 w-96 -translate-x-1/2 rounded-full bg-red-500/5 blur-3xl dark:bg-red-500/10" />
-      <div className="absolute -bottom-12 left-1/3 -z-10 h-48 w-48 rounded-full bg-cyan-500/5 blur-3xl dark:bg-cyan-500/10" />
+      <div className="absolute -bottom-12 left-1/3 -z-10 h-48 w-48 rounded-full bg-amber-500/5 blur-3xl dark:bg-amber-500/10" />
 
       <div className="mx-auto max-w-3xl text-center">
-        <p className="mb-4 text-sm font-semibold tracking-widest text-red-500 uppercase dark:text-red-400">
-          Seguridad ofensiva profesional
+        {/* Bug mascot — walking idle above kicker */}
+        <div className="mb-6 flex justify-center text-red-600 dark:text-red-500">
+          <BugMascot mode="idle" size="lg" ariaLabel="CobaltoSec bug mascot" />
+        </div>
+
+        <p className="mb-4 font-mono text-sm tracking-widest text-red-500 uppercase dark:text-red-400">
+          [ seguridad · ofensiva · profesional ]
         </p>
 
         <h1 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
           Nicolás Padilla
         </h1>
 
-        <p className="mt-4 text-xl font-medium text-gray-600 sm:text-2xl dark:text-gray-400">
-          Offensive Security Consultant
+        <p className="mt-4 font-mono text-xl font-medium text-gray-600 sm:text-2xl dark:text-gray-400">
+          &gt; offensive_security_consultant
+          <span className="animate-cursor-blink inline-block">_</span>
         </p>
 
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-gray-500 dark:text-gray-400">

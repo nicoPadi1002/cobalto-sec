@@ -100,7 +100,7 @@ export default function ProjectCard({
           <div className="mt-6 grid grid-cols-3 gap-4 rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-4 dark:border-gray-800 dark:from-gray-800 dark:to-gray-900">
             {metrics.map((metric, idx) => (
               <div key={idx} className="text-center">
-                <p className="font-mono text-lg font-bold text-cyan-600 dark:text-cyan-400">
+                <p className="font-mono text-lg font-bold text-amber-600 dark:text-amber-400">
                   {metric.value}
                 </p>
                 <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">{metric.label}</p>

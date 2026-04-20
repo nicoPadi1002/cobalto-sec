@@ -56,7 +56,7 @@ export default function TopCredentials({ credentials, commands, countries }: Top
                   key={i}
                   className="border-b border-gray-50 transition-colors hover:bg-gray-50 dark:border-gray-800/50 dark:hover:bg-gray-800/30"
                 >
-                  <td className="px-5 py-2 font-mono text-xs text-cyan-600 sm:px-6 dark:text-cyan-400">
+                  <td className="px-5 py-2 font-mono text-xs text-amber-600 sm:px-6 dark:text-amber-400">
                     {cred.username}
                   </td>
                   <td className="py-2 font-mono text-xs text-gray-500 dark:text-gray-500">
@@ -112,7 +112,7 @@ export default function TopCredentials({ credentials, commands, countries }: Top
                 </div>
                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-red-500 to-cyan-500"
+                    className="h-full rounded-full bg-gradient-to-r from-red-500 to-amber-500"
                     style={{ width: `${pct}%` }}
                   />
                 </div>

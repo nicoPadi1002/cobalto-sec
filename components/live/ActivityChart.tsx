@@ -19,7 +19,7 @@ export default function ActivityChart({ data }: ActivityChartProps) {
               className="group relative flex h-full flex-1 flex-col items-center justify-end"
             >
               <div
-                className="w-full rounded-t bg-gradient-to-t from-red-500 to-cyan-500 transition-opacity group-hover:opacity-80"
+                className="w-full rounded-t bg-gradient-to-t from-red-500 to-amber-500 transition-opacity group-hover:opacity-80"
                 style={{ height: `${pct}%`, minHeight: pct > 0 ? '2px' : '0px' }}
               />
               {/* Tooltip */}

@@ -4,7 +4,7 @@ import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
-import { Space_Grotesk, JetBrains_Mono } from 'next/font/google'
+import { Space_Grotesk, JetBrains_Mono, Press_Start_2P } from 'next/font/google'
 // Umami analytics injected directly via next/script in <head>
 import { SearchProvider, type SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
@@ -24,6 +24,13 @@ const jetbrains_mono = JetBrains_Mono({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-jetbrains-mono',
+})
+
+const press_start_2p = Press_Start_2P({
+  subsets: ['latin'],
+  weight: '400',
+  display: 'swap',
+  variable: '--font-press-start-2p',
 })
 
 export const metadata: Metadata = {
@@ -82,7 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${space_grotesk.variable} ${jetbrains_mono.variable} scroll-smooth`}
+      className={`${space_grotesk.variable} ${jetbrains_mono.variable} ${press_start_2p.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
