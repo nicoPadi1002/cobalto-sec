@@ -182,11 +182,17 @@
     }
   }
 
-  /* Animación fade-in */
-  .animate-fade-in {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-    transform: translateX(0) !important;
+  /* Fade-in progressive enhancement
+     Content renders visible by default; animates if CSS supports it.
+     Respects prefers-reduced-motion via @media block below. */
+  .cs-fade-in {
+    animation: cs-fade-in 0.7s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cs-fade-in {
+      animation: none;
+    }
   }
 
   /* Link underline animation */
@@ -243,6 +249,17 @@ html[data-crt='on'] body {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes cs-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

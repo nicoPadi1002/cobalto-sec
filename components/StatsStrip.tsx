@@ -33,7 +33,7 @@ function buildStats(s: HoneypotStats) {
 
 export default function StatsStrip() {
   const [stats, setStats] = useState(() => buildStats(mockData.stats))
-  const [visible, setVisible] = useState(false)
+  const [animated, setAnimated] = useState(false)
   const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -50,22 +50,21 @@ export default function StatsStrip() {
     load()
   }, [])
 
+  // IntersectionObserver adds a one-shot fade-in when the grid enters view.
+  // If it doesn't fire (reduced-motion, viewport quirk), content stays visible anyway.
   useEffect(() => {
     const el = gridRef.current
     if (!el) return
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduceMotion) {
-      setVisible(true)
-      return
-    }
+    if (reduceMotion) return
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setVisible(true)
+          setAnimated(true)
           observer.disconnect()
         }
       },
-      { threshold: 0.25 }
+      { threshold: 0.15 }
     )
     observer.observe(el)
     return () => observer.disconnect()
@@ -88,7 +87,7 @@ export default function StatsStrip() {
             <div
               key={index}
               className={`group rounded-xl border border-gray-200 bg-white p-5 text-center transition-all duration-300 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5 sm:p-6 dark:border-gray-800 dark:bg-gray-900/50 dark:hover:border-red-500/30 dark:hover:shadow-red-500/10 ${
-                visible ? 'animate-count-up' : 'opacity-0'
+                animated ? 'animate-count-up' : ''
               }`}
               style={{ animationDelay: `${index * 120}ms` }}
             >

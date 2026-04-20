@@ -1,6 +1,4 @@
-'use client'
-
-import { useEffect, useRef, ReactNode } from 'react'
+import { ReactNode } from 'react'
 
 interface FadeInProps {
   children: ReactNode
@@ -9,62 +7,13 @@ interface FadeInProps {
   className?: string
 }
 
-export default function FadeIn({
-  children,
-  delay = 0,
-  direction = 'up',
-  className = '',
-}: FadeInProps) {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in')
-            observer.unobserve(entry.target)
-          }
-        })
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px',
-      }
-    )
-
-    if (ref.current) {
-      observer.observe(ref.current)
-    }
-
-    return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current)
-      }
-    }
-  }, [])
-
-  const getInitialTransform = () => {
-    switch (direction) {
-      case 'up':
-        return 'translate-y-8'
-      case 'down':
-        return '-translate-y-8'
-      case 'left':
-        return 'translate-x-8'
-      case 'right':
-        return '-translate-x-8'
-      default:
-        return ''
-    }
-  }
-
+// Pure-CSS fade-in wrapper. No IntersectionObserver, no client-side JS.
+// The content is always rendered to the DOM — the animation is a progressive
+// enhancement that runs on mount. If animations are disabled (reduced-motion
+// or CSS fails), content stays visible.
+export default function FadeIn({ children, delay = 0, className = '' }: FadeInProps) {
   return (
-    <div
-      ref={ref}
-      className={`opacity-0 ${getInitialTransform()} transition-all duration-700 ease-out ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
+    <div className={`cs-fade-in ${className}`} style={{ animationDelay: `${delay}ms` }}>
       {children}
     </div>
   )

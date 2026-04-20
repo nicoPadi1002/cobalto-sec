@@ -104,52 +104,69 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="afterInteractive"
         />
       </head>
-      <body className="relative bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
-        {/* Circuit pattern background */}
-        <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] dark:opacity-[0.06]">
-          <svg width="200%" height="200%" className="animate-circuit-drift">
+      <body className="relative bg-[#f5f0e8] pl-[calc(100vw-100%)] text-black antialiased dark:bg-[#0a0908] dark:text-white">
+        {/* CRT grid background — graph paper + amber phosphor dots */}
+        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+          {/* Layer 1: grid lines (warm gray) */}
+          <svg
+            className="absolute inset-0 h-full w-full text-gray-800 opacity-[0.08] dark:text-gray-500 dark:opacity-[0.12]"
+            aria-hidden="true"
+          >
             <defs>
               <pattern
-                id="circuit"
+                id="crt-grid"
                 x="0"
                 y="0"
-                width="100"
-                height="100"
+                width="48"
+                height="48"
                 patternUnits="userSpaceOnUse"
               >
-                {/* Horizontal lines */}
-                <line x1="0" y1="20" x2="100" y2="20" stroke="currentColor" strokeWidth="0.5" />
-                <line x1="0" y1="80" x2="100" y2="80" stroke="currentColor" strokeWidth="0.5" />
-
-                {/* Vertical lines */}
-                <line x1="20" y1="0" x2="20" y2="100" stroke="currentColor" strokeWidth="0.5" />
-                <line x1="80" y1="0" x2="80" y2="100" stroke="currentColor" strokeWidth="0.5" />
-
-                {/* Corner connections */}
-                <line x1="20" y1="20" x2="30" y2="20" stroke="currentColor" strokeWidth="0.5" />
-                <line x1="70" y1="20" x2="80" y2="20" stroke="currentColor" strokeWidth="0.5" />
-                <line x1="20" y1="80" x2="30" y2="80" stroke="currentColor" strokeWidth="0.5" />
-                <line x1="70" y1="80" x2="80" y2="80" stroke="currentColor" strokeWidth="0.5" />
-
-                {/* Circuit nodes (small circles) */}
-                <circle cx="20" cy="20" r="1.5" fill="currentColor" />
-                <circle cx="80" cy="20" r="1.5" fill="currentColor" />
-                <circle cx="20" cy="80" r="1.5" fill="currentColor" />
-                <circle cx="80" cy="80" r="1.5" fill="currentColor" />
-                <circle cx="50" cy="50" r="1" fill="currentColor" />
-
-                {/* Diagonal traces */}
-                <line x1="30" y1="20" x2="50" y2="50" stroke="currentColor" strokeWidth="0.3" />
-                <line x1="50" y1="50" x2="70" y2="80" stroke="currentColor" strokeWidth="0.3" />
+                <path d="M 48 0 L 0 0 0 48" fill="none" stroke="currentColor" strokeWidth="0.5" />
               </pattern>
             </defs>
-            <rect
-              width="100%"
-              height="100%"
-              fill="url(#circuit)"
-              className="text-gray-900 dark:text-red-500"
-            />
+            <rect width="100%" height="100%" fill="url(#crt-grid)" />
           </svg>
+
+          {/* Layer 2: amber phosphor dots at intersections */}
+          <svg
+            className="absolute inset-0 h-full w-full text-amber-600 opacity-[0.18] dark:text-amber-500 dark:opacity-[0.22]"
+            aria-hidden="true"
+          >
+            <defs>
+              <pattern
+                id="crt-dots"
+                x="0"
+                y="0"
+                width="48"
+                height="48"
+                patternUnits="userSpaceOnUse"
+              >
+                <circle cx="0" cy="0" r="1" fill="currentColor" />
+                <circle cx="48" cy="0" r="1" fill="currentColor" />
+                <circle cx="0" cy="48" r="1" fill="currentColor" />
+                <circle cx="48" cy="48" r="1" fill="currentColor" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#crt-dots)" />
+          </svg>
+
+          {/* Layer 3: radial glow from top-center (amber phosphor flood) */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,176,0,0.08), transparent 60%)',
+            }}
+          />
+
+          {/* Layer 4: vignette (darker corners) */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse 100% 70% at 50% 50%, transparent 40%, rgba(0,0,0,0.35) 100%)',
+            }}
+          />
         </div>
 
         <ThemeProviders>

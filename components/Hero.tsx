@@ -3,18 +3,15 @@ import BugMascot from './BugMascot'
 
 export default function Hero() {
   return (
-    <section className="relative -mx-4 overflow-hidden px-4 py-24 sm:-mx-6 sm:px-6 sm:py-32 lg:py-40">
-      {/* Background gradient */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-gray-50 via-white to-white dark:from-gray-900 dark:via-gray-950 dark:to-gray-950" />
-
-      {/* Glow accents */}
-      <div className="absolute -top-24 left-1/2 -z-10 h-96 w-96 -translate-x-1/2 rounded-full bg-red-500/5 blur-3xl dark:bg-red-500/10" />
-      <div className="absolute -bottom-12 left-1/3 -z-10 h-48 w-48 rounded-full bg-amber-500/5 blur-3xl dark:bg-amber-500/10" />
+    <section className="relative -mx-4 overflow-hidden px-4 pt-6 pb-16 sm:-mx-6 sm:px-6 sm:pt-10 sm:pb-20 lg:pt-14 lg:pb-28">
+      {/* Glow accents — sit on top of the global CRT grid background */}
+      <div className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-96 w-96 -translate-x-1/2 rounded-full bg-red-500/10 blur-3xl dark:bg-red-500/20" />
+      <div className="pointer-events-none absolute -bottom-12 left-1/3 -z-10 h-48 w-48 rounded-full bg-amber-500/10 blur-3xl dark:bg-amber-500/20" />
 
       <div className="mx-auto max-w-3xl text-center">
         {/* Bug mascot — walking idle above kicker */}
-        <div className="mb-6 flex justify-center text-red-600 dark:text-red-500">
-          <BugMascot mode="idle" size="lg" ariaLabel="CobaltoSec bug mascot" />
+        <div className="mb-3 flex justify-center text-red-600 dark:text-red-500">
+          <BugMascot mode="idle" size="md" ariaLabel="CobaltoSec bug mascot" />
         </div>
 
         <p className="mb-4 font-mono text-sm tracking-widest text-red-500 uppercase dark:text-red-400">
