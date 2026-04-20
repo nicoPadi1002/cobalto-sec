@@ -46,7 +46,7 @@ infra:
       puerto: 3000
       url: "http://localhost:3000"
   paths:
-    proyecto: "C:\\Users\\nicol\\Desktop\\WEB\\cobalto-sec-clean"
+    proyecto: "C:\\Proyectos\\CobaltoSec-Web"
     db: "N/A - Static Site (Contentlayer MDX)"
     logs: "Vercel Dashboard / npm run dev console"
 
