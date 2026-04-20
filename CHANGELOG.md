@@ -6,6 +6,56 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [B6 - Rebrand Amber CRT + Bug Mascot] - 2026-04-20
+
+### Agregado
+
+- **Paleta "Amber CRT"** (OKLCH en Tailwind v4 `@theme`):
+  - Anchor rojo sangre `#dc2626` (reemplaza warning `#ef4444`)
+  - Acento amber phosphor `#ffb000` (reemplaza cyan `#06b6d4`, sale del pool visual del sector infosec)
+  - Neutrals warm (hue ~70) en vez de blue-tinted
+  - Bases `#0a0908` warm-black (dark) / `#f5f0e8` paper (light)
+  - Override de rampa `--color-red-*` completa para re-tintear 271 usos hardcoded sin find/replace
+- **`components/BugMascot.tsx`** — Mascot beetle SVG inline (head + duotone elytra + central split + 6 patas + 2 antenas). Modes: `idle` (walking CSS animation), `squashed` (404), `static` (footer).
+- **`components/CrtToggle.tsx`** — Modo CRT ortogonal vía `data-crt=on` + `localStorage`. Hotkey `~` global (ignora inputs). Scanlines overlay (`body::after` repeating-linear-gradient) + phosphor text-shadow.
+- **Press Start 2P** pixel font vía `next/font/google`. Uso restringido: mascot label, números de StatsStrip, PGP fingerprint.
+- **Fondo CRT global** (`app/layout.tsx`): 4 layers — graph paper grid 48×48, amber phosphor dots en intersecciones, radial glow amber desde top, vignette en bordes.
+- **Nav brackets**: items envueltos en `[ items ]` + `font-mono` + rojo en brackets. Header + MobileNav + NavDropdown.
+- **Hero rediseñado**: kicker `[ seguridad · ofensiva · profesional ]` monoespacio, role con cursor `_` blinking, padding reducido (`pt-6/10/14 pb-16/20/28`).
+- **404 rediseñada**: bug aplastado (squashed) + copy `$ cat /requested/path → No such file or directory`.
+- **Footer**: bug static + CRT toggle button visible + bloque PGP opcional (gated por `NEXT_PUBLIC_PGP_FINGERPRINT` env var).
+- **Logo**: gradient sky → sangre `#dc2626` + logotipo warm-gray `#a6a09b`.
+
+### Refactorizado
+
+- **`components/FadeIn.tsx`**: reescrito como CSS puro (sin IntersectionObserver, sin JS client-side). Contenido siempre renderizado, animación como progressive enhancement via keyframe `cs-fade-in`. Respeta `prefers-reduced-motion`. **Fix crítico**: antes dependía de `opacity-0` inicial + IO → cuando JS no hidrataba (cache bundler roto), el body del home quedaba completamente invisible.
+- **StatsStrip**: IntersectionObserver ahora es opcional enhancement. Grid siempre renderizado (sin `opacity-0` inicial).
+- **Hero**: glow accents viven sobre el fondo CRT global (no crean gradient local que compita).
+
+### Corregido
+
+- Build cache stale causaba HTML SSR sin contenido después del Hero. Solución: `rm -rf .next .contentlayer && yarn dev`. FadeIn rewrite evita que se repita.
+- `@iconify/react` runtime fetch fallaba silenciosamente en primera carga → reemplazado por SVG inline en BugMascot (100% reliable, sin network).
+
+### Eliminado
+
+- `components/LayoutWrapper.tsx` — archivo muerto (usaba Inter, nadie lo importaba).
+- `app/services/page.tsx` — redirect `/services → /servicios` ya vigente en `next.config.mjs`, el archivo nunca se renderizaba.
+- `app/mascot-preview/` — ruta interna temporal usada para elegir el mascot.
+
+### Infra
+
+- Dependencia nueva: `@iconify/react@6.0.2` (se dejó instalada por si se usa en futuro, pero BugMascot es inline).
+- Repo movido de `C:\Users\nicol\Desktop\WEB\cobalto-sec-clean\` → `C:\Proyectos\CobaltoSec-Web\` (alineado al patrón del resto de webs). Vercel remote intacto.
+
+### Referencias de diseño
+
+- **Synacktiv** — mascot animado protagónico, counters Synacktiv-style en StatsStrip.
+- **Latacora** — easter egg CRT mode como layer ortogonal (no tema separado).
+- **Terminal Shop** — brackets en nav, bloque PGP como credibility signal.
+
+---
+
 ## [B4 - Dashboard + Umami + CSP] - 2026-02-06
 
 ### Agregado

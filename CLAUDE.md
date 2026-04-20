@@ -6,16 +6,32 @@ Portfolio profesional y blog técnico de ciberseguridad de **Nicolás Padilla**.
 
 ## Stack
 
-| Componente      | Tecnología                  | Notas                        |
-| --------------- | --------------------------- | ---------------------------- |
-| Framework       | Next.js 14 (App Router)     | SSG, React Server Components |
-| Lenguaje        | TypeScript                  | Strict mode                  |
-| Estilos         | Tailwind CSS v4             | PostCSS plugin, tema OKLCH   |
-| Contenido       | Contentlayer2 + MDX         | Build-time processing        |
-| Hosting         | Vercel                      | Auto-deploy desde `main`     |
-| Búsqueda        | Kbar                        | Command palette              |
-| Analytics       | Umami (self-hosted, activo) | analytics.cobalto-sec.tech   |
-| Package Manager | Yarn 3.6.1                  |                              |
+| Componente      | Tecnología                                      | Notas                                         |
+| --------------- | ----------------------------------------------- | --------------------------------------------- |
+| Framework       | Next.js 14 (App Router)                         | SSG, React Server Components                  |
+| Lenguaje        | TypeScript                                      | Strict mode                                   |
+| Estilos         | Tailwind CSS v4                                 | `@theme` directive, OKLCH, paleta "Amber CRT" |
+| Fonts           | Space Grotesk + JetBrains Mono + Press Start 2P | `next/font/google` self-hosted, display swap  |
+| Contenido       | Contentlayer2 + MDX                             | Build-time processing                         |
+| Hosting         | Vercel                                          | Auto-deploy desde `main`                      |
+| Búsqueda        | Kbar                                            | Command palette                               |
+| Analytics       | Umami (self-hosted, activo)                     | analytics.cobalto-sec.tech                    |
+| Package Manager | Yarn 3.6.1                                      |                                               |
+
+### Paleta "Amber CRT" (B6)
+
+- **Anchor** rojo sangre `#dc2626` (override de `--color-red-*` + `--color-primary-*`)
+- **Acento** amber phosphor `#ffb000` (`--color-amber-*`, evoca VT100 / IBM 80s)
+- **Bases warm** `#0a0908` (dark) / `#f5f0e8` (paper, light)
+- **Neutrals warm** (hue ~70, no blue-tinted)
+
+### Modo CRT (B6)
+
+- Ortogonal a light/dark: activado via `document.documentElement.dataset.crt = 'on'` + `localStorage.crtMode`
+- Hotkey global `~` (ignora inputs/textareas/contenteditable)
+- Toggle visible en Footer (`components/CrtToggle.tsx`)
+- CSS variant `crt:` declarado en `tailwind.css` → `@custom-variant crt (&:where([data-crt=on], [data-crt=on] *))`
+- Efectos: scanlines overlay (body::after) + phosphor text-shadow global
 
 ## Estructura de Archivos
 
@@ -37,7 +53,7 @@ data/
   siteMetadata.js       # Config global del sitio
   headerNavLinks.ts     # Navegación
 css/
-  tailwind.css          # Tema custom (colores cyan/sky, Space Grotesk)
+  tailwind.css          # Paleta "Amber CRT" (OKLCH) + keyframes + variant crt
   prism.css             # Syntax highlighting
 public/
   static/images/        # Assets de posts y proyectos
